@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ReleaseNotes.fs" />
+    <Compile Include="Model.fs" />
+    <Compile Include="Database.fs" />
+    <Compile Include="Styles.fs" />
+    <Compile Include="Scenes/CheckLocation.fs" />
+    <Compile Include="Scenes/LocationList.fs" />
+    <Compile Include="Scenes/Home.fs" />
+    <Compile Include="Scenes/App.fs" />
+    <Compile Include="Nightwatch.fs" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>

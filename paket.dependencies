@@ -1,0 +1,28 @@
+source https://nuget.org/api/v2
+
+nuget FSharp.Core redirects: force
+nuget Fable.Core
+
+nuget Fable.PowerPack
+nuget Fable.React
+nuget Fable.React.Native
+nuget Fable.Elmish
+nuget Fable.Elmish.React
+nuget Fable.Elmish.HMR
+nuget Fable.Import.Browser
+
+clitool dotnet-fable
+
+group Test
+
+generate_load_scripts: true
+source https://nuget.org/api/v2
+framework >= net45
+nuget FSharp.Core redirects: force
+nuget Canopy.Mobile
+nuget Expecto
+
+group Build
+source https://nuget.org/api/v2
+  
+nuget FAKE
