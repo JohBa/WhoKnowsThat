@@ -1,6 +1,6 @@
 {
-  "name": "nightwatch",
-  "version": "1.0.0",
+  "name": "whoknows",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build": "fable-splitter -c splitter.config.js --define RELEASE",

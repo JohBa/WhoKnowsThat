@@ -7,11 +7,9 @@
     <Compile Include="Model.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Styles.fs" />
-    <Compile Include="Scenes/CheckLocation.fs" />
-    <Compile Include="Scenes/LocationList.fs" />
     <Compile Include="Scenes/Home.fs" />
     <Compile Include="Scenes/App.fs" />
-    <Compile Include="Nightwatch.fs" />
+    <Compile Include="WhoKnows.fs" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

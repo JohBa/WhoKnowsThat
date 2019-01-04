@@ -1,12 +1,11 @@
 module internal ReleaseNotes
 
-let AppVersion = "1.0.0"
+let AppVersion = "0.0.1"
 
 let IsPrerelease = false
 
-let AndroidVersionCode = 41
+let AndroidVersionCode = 45
 
 let Notes = """
-#### 1.0.0 - 17.10.2016
-* First release
+#### 0.0.1 - 04.01.2019
 """

@@ -93,11 +93,11 @@ android {
     compileSdkVersion 23
 
     defaultConfig {
-        applicationId "com.nightwatch"
+        applicationId "com.whoknows"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 42
-        versionName "1.0.0"
+        versionCode 46
+        versionName "0.0.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

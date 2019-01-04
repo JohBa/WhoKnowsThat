@@ -14,7 +14,7 @@ if (idx > -1) {
 console.log("Bundling for " + define + "...");
 
 module.exports = {
-  entry: resolve('src/Nightwatch.fsproj'),
+  entry: resolve('src/WhoKnows.fsproj'),
   outDir: resolve("out"),
   babel: {
      //   presets: [["es2015", { modules: false }]],

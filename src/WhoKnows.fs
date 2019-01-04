@@ -1,4 +1,4 @@
-module Nightwatch
+module WhoKnows
 
 open Elmish
 open Elmish.React
@@ -25,5 +25,5 @@ Program.mkProgram App.init App.update App.view
 |> Program.withConsoleTrace
 |> Program.withHMR
 #endif
-|> Program.withReactNative "nightwatch"
+|> Program.withReactNative "whoknows"
 |> Program.run

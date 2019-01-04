@@ -2,17 +2,10 @@ module Model
 
 open System
 
-type LocationId = string
+type Question = string
 
-[<RequireQualifiedAccess>]
-type LocationStatus =
-| Ok
-| Alarm of string
-
-type LocationCheckRequest = {
-    LocationId : LocationId
-    Name: string
-    Address: string
-    Status : LocationStatus option
-    Date : DateTime option
+type Answer = {
+    AnswerId: string
+    PlayerId: string
+    Value: string
 }
