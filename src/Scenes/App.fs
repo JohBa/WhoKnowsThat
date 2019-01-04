@@ -1,20 +1,23 @@
 module App
 
 open Elmish
-open Elmish.React
+open Model
 
 [<RequireQualifiedAccess>]
 type Page =
 | Home
+| Question
 
 type Msg =
 | NavigateTo of Page
 | NavigateBack
 | ExitApp
 | HomeSceneMsg of Home.Msg
+| QuestionSceneMsg of Question.Msg
 
 type SubModel =
 | HomeModel of Home.Model
+| QuestionModel of Question.Model
 
 type Model = {
     SubModel : SubModel
@@ -27,7 +30,13 @@ let wrap ctor msgCtor model (subModel,cmd)  =
 let navigateTo page newStack model =
     match page with
     | Page.Home -> Home.init() |> wrap HomeModel HomeSceneMsg model
+    | Page.Question -> Question.init() |> wrap QuestionModel QuestionSceneMsg model
     |> fun (model,cmd) -> { model with NavigationStack = newStack },cmd
+
+let init() =
+    let subModel,cmd = Home.init() 
+    { SubModel = HomeModel subModel
+      NavigationStack = [Page.Home] }, Cmd.map HomeSceneMsg cmd
 
 let update (msg:Msg) model : Model*Cmd<Msg> = 
     match msg with
@@ -35,9 +44,18 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | HomeModel subModel -> 
             match subMsg with
+            | Home.StartGame ->
+                model, Cmd.ofMsg (NavigateTo Page.Question)
             | _ ->
                 Home.update subMsg subModel |> wrap HomeModel HomeSceneMsg model
-        | _ -> model,Cmd.none
+        | _ -> model, Cmd.none
+    | QuestionSceneMsg subMsg ->
+        match model.SubModel with
+        | QuestionModel subModel ->
+            match subMsg with
+            | _ -> 
+                Question.update subMsg subModel |> wrap QuestionModel QuestionSceneMsg model
+        | _ -> model, Cmd.none
 
     | NavigateTo page -> 
         navigateTo page (page::model.NavigationStack) model
@@ -45,17 +63,13 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
     | NavigateBack -> 
         match model.NavigationStack with
         | _::page::rest -> navigateTo page (page::rest) model
-        | _ -> model,Cmd.ofMsg ExitApp
+        | _ -> model, Cmd.ofMsg ExitApp
 
     | ExitApp -> 
         Fable.Helpers.ReactNative.exitApp() 
         model,Cmd.none
 
-let init() =
-    let subModel,cmd = Home.init() 
-    { SubModel = HomeModel subModel
-      NavigationStack = [Page.Home] }, Cmd.map HomeSceneMsg cmd
-
 let view (model:Model) (dispatch: Msg -> unit) =
     match model.SubModel with
     | HomeModel model -> Home.view model (HomeSceneMsg >> dispatch)
+    | QuestionModel model -> Question.view model (QuestionSceneMsg >> dispatch)

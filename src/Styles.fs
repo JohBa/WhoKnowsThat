@@ -12,19 +12,19 @@ let [<Literal>] brandSidebar = "#252932"
 
 let [<Literal>] inverseTextColor = "#000"
 
-let [<Literal>] textColor = "#FFFFFF"
+let [<Literal>] textColor = "#444444"
 
 let [<Literal>] shadowColor = "#000000"
 
-let [<Literal>] backgroundColor = "#615A5B"
-let [<Literal>] inputBackgroundColor = "#251D1C"
+let [<Literal>] backgroundColor = "#FFFFFF"
+let [<Literal>] inputBackgroundColor = "#FFFFFF"
 
 let [<Literal>] touched = "#5499C4"
 
 let [<Literal>] fontSizeBase = 15.
 let [<Literal>] smallFontSize = 10.
 let [<Literal>] mediumFontSize = 12.
-let [<Literal>] titleFontSize = 17.
+let [<Literal>] titleFontSize = 27.
 
 let [<Literal>] borderRadius = 4.
 
@@ -51,7 +51,6 @@ let sceneBackground<'a> =
         ViewStyle.ShadowColor shadowColor
         ViewStyle.ShadowOpacity 0.8
         ViewStyle.ShadowRadius 3.
-        FlexStyle.JustifyContent JustifyContent.Center
         FlexStyle.Flex 1.
         ViewStyle.BackgroundColor backgroundColor
       ]

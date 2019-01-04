@@ -7,6 +7,7 @@
     <Compile Include="Model.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Styles.fs" />
+    <Compile Include="Scenes/Question.fs" />
     <Compile Include="Scenes/Home.fs" />
     <Compile Include="Scenes/App.fs" />
     <Compile Include="WhoKnows.fs" />
