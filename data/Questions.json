@@ -2,11 +2,13 @@
     {
       "Question": "Der/Die/Das Hunt ist ein...",
       "CorrectAnswer": "Ein offener, kastenförmiger Förderwagen",
-      "Language": "de"
+      "Language": "de",
+      "TrueOrFalse": false
     },
     {
       "Question": "Was ist in Baltimore (USA) seit 1898 verboten?",
       "CorrectAnswer": "Mit ärmellosen Hemden durch den Park zu laufen",
-      "Language": "de"
+      "Language": "de",
+      "TrueOrFalse": false
     }
   ]

@@ -5,6 +5,8 @@ open System
 type Question = {
     Question: string
     CorrectAnswer: string 
+    Language: string
+    TrueOrFalse: bool
 }
 
 type PlayerAnswer = {
@@ -12,3 +14,20 @@ type PlayerAnswer = {
     PlayerId: string
     Value: string
 }
+
+type Player = {
+    Id: string
+    Name: string
+}
+
+type GameQuestion = {
+    Question: Question
+    Answer: PlayerAnswer
+}
+
+type Game = {
+    GameId: string
+    Players: Player list
+    Questions: GameQuestion list
+}
+

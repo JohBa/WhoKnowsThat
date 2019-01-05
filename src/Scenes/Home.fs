@@ -2,11 +2,6 @@ module Home
 
 open Fable.Helpers.ReactNative
 open Elmish
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
 open Fable.Helpers.ReactNative.Props
 
 // Model

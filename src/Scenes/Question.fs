@@ -2,18 +2,8 @@ module Question
 
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
-open Fable.PowerPack
 open Elmish
-open Fable.PowerPack.Fetch
 
-open Database
-open Fable.Import.ReactNative.Animated
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props.TextInput
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props.TextInput
-open Fable.Import.ReactNative
 
 type Status =
 | NotStarted
@@ -37,7 +27,7 @@ type Model = {
 let init () = 
     { 
       Status = NotStarted
-      Question = { CorrectAnswer = ""; Question = "" }
+      Question = { CorrectAnswer = ""; Question = ""; Language = ""; TrueOrFalse = false }
       PlayerAnswer = { AnswerId = System.Guid.NewGuid().ToString(); Value = ""; PlayerId = "" } 
     }, Cmd.ofMsg GetQuestion
 

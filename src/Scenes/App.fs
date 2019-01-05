@@ -1,7 +1,6 @@
 module App
 
 open Elmish
-open Model
 
 [<RequireQualifiedAccess>]
 type Page =
@@ -10,6 +9,7 @@ type Page =
 
 type Msg =
 | NavigateTo of Page
+| NavigateToRoot
 | NavigateBack
 | ExitApp
 | HomeSceneMsg of Home.Msg
@@ -59,6 +59,10 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 
     | NavigateTo page -> 
         navigateTo page (page::model.NavigationStack) model
+
+    | NavigateToRoot -> 
+        let last = model.NavigationStack |> List.last
+        navigateTo last [last] model
 
     | NavigateBack -> 
         match model.NavigationStack with
