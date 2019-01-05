@@ -3,24 +3,29 @@ module Local.ChoosePlayer
 open Fable.Helpers.ReactNative
 open Elmish
 open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative.Globals
+open Fable.Import.ReactNative
 
 
 // Model
 type Msg =
 | SaveAndForward
-| AcceptInput of string
+| AcceptInput
 | DeletePlayer of string
 | AddNewPlayer
 | PlayerNameChanged of string
 | Error of exn
 
 type Model = { 
+    PlayerName: string
     Players: Model.Player list
     StatusText: string
     IsAdding: bool
 }
 
-let init () = { StatusText = ""; Players = [{Id = System.Guid.NewGuid.ToString(); Name = "Johannes"}]; IsAdding = true }, Cmd.none
+let init () = { PlayerName = ""; StatusText = ""; Players = [{Id = System.Guid.NewGuid.ToString(); Name = "Johannes"}]; IsAdding = true }, Cmd.none
 
 // Update
 let update (msg:Msg) model : Model*Cmd<Msg> =
@@ -29,10 +34,12 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         model, Cmd.none // handled above
 
     | AddNewPlayer ->
-        model, Cmd.none
+        { model with IsAdding = true }, Cmd.none
 
-    | AcceptInput name -> 
-        { model with StatusText = "Number of players " + model.Players.Length.ToString() }, Cmd.none
+    | AcceptInput -> 
+        let newPlayer : Model.Player = { Id = System.Guid.NewGuid().ToString(); Name = model.PlayerName }
+        let playersList = [newPlayer] @ model.Players
+        { model with IsAdding = false; Players = playersList; PlayerName = ""; StatusText = "Number of players " + playersList.Length.ToString() }, Cmd.none
 
     | DeletePlayer id ->
         model, Cmd.none
@@ -41,7 +48,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         { model with StatusText = string e.Message }, Cmd.none
 
     | PlayerNameChanged name ->
-        model, Cmd.none
+        { model with PlayerName = name }, Cmd.none
 
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
@@ -49,6 +56,34 @@ let view (model:Model) (dispatch: Msg -> unit) =
         model.Players |> List.map (fun p -> 
             text [] p.Name
         )
+
+    let addPlayer = 
+        match model.IsAdding with
+        | true ->
+            view 
+             [ 
+                ViewProperties.Style [ 
+                    FlexStyle.FlexDirection FlexDirection.Row
+                    FlexStyle.MarginTop 3. 
+                    FlexStyle.MarginBottom 3.
+                    FlexStyle.AlignSelf Alignment.Stretch
+                ] 
+             ] [
+              textInput [
+                TextInput.TextInputProperties.AutoCorrect true
+                TextInput.TextInputProperties.OnChangeText (PlayerNameChanged >> dispatch)
+                TextInput.TextInputProperties.Style [
+                    FlexStyle.Flex 1.
+                    FlexStyle.AlignItems ItemAlignment.Stretch
+                ]
+              ] model.PlayerName
+              button [
+                  ButtonProperties.Title "Ok"
+                  ButtonProperties.OnPress (fun () -> dispatch AcceptInput)
+              ] [ ]
+             ]
+        | _ -> Styles.whitespace
+     
     scrollView [ Styles.sceneBackground ]
       [ text 
           [ 
@@ -56,6 +91,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
           ] "Choose your players"
         view [ ViewProperties.Style [ FlexStyle.MarginTop 40. ] ]
           players
+        addPlayer
         view [ ViewProperties.Style [ FlexStyle.MarginTop 20. ] ] [
           button [
               ButtonProperties.Title "Add player"
