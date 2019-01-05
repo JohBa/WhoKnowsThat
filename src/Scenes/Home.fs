@@ -6,7 +6,7 @@ open Fable.Helpers.ReactNative.Props
 
 // Model
 type Msg =
-| StartGame
+| StartLocalGame
 | GetQuestions
 | QuestionsLoaded of int
 | Error of exn
@@ -41,8 +41,8 @@ let view (model:Model) (dispatch: Msg -> unit) =
             ] "Who knows that?!"
           view [ ViewProperties.Style [ FlexStyle.MarginTop 50. ] ] [
             button [
-                ButtonProperties.Title "Start Game"
-                ButtonProperties.OnPress (fun () -> dispatch StartGame)
+                ButtonProperties.Title "Start local Game"
+                ButtonProperties.OnPress (fun () -> dispatch StartLocalGame)
             ] [ ]
           ]
           Styles.whitespace

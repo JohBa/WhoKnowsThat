@@ -1,11 +1,13 @@
 module App
 
 open Elmish
+open Fable.PowerPack.Date
 
 [<RequireQualifiedAccess>]
 type Page =
 | Home
 | Question
+| LocalChoosePlayer
 
 type Msg =
 | NavigateTo of Page
@@ -14,10 +16,12 @@ type Msg =
 | ExitApp
 | HomeSceneMsg of Home.Msg
 | QuestionSceneMsg of Question.Msg
+| LocalChoosePlayerMsg of Local.ChoosePlayer.Msg
 
 type SubModel =
 | HomeModel of Home.Model
 | QuestionModel of Question.Model
+| LocalChoosePlayerModel of Local.ChoosePlayer.Model
 
 type Model = {
     SubModel : SubModel
@@ -31,6 +35,7 @@ let navigateTo page newStack model =
     match page with
     | Page.Home -> Home.init() |> wrap HomeModel HomeSceneMsg model
     | Page.Question -> Question.init() |> wrap QuestionModel QuestionSceneMsg model
+    | Page.LocalChoosePlayer -> Local.ChoosePlayer.init() |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
     |> fun (model,cmd) -> { model with NavigationStack = newStack },cmd
 
 let init() =
@@ -44,8 +49,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | HomeModel subModel -> 
             match subMsg with
-            | Home.StartGame ->
-                model, Cmd.ofMsg (NavigateTo Page.Question)
+            | Home.StartLocalGame ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalChoosePlayer)
             | _ ->
                 Home.update subMsg subModel |> wrap HomeModel HomeSceneMsg model
         | _ -> model, Cmd.none
@@ -55,6 +60,14 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
             match subMsg with
             | _ -> 
                 Question.update subMsg subModel |> wrap QuestionModel QuestionSceneMsg model
+        | _ -> model, Cmd.none
+    
+    | LocalChoosePlayerMsg subMsg ->
+        match model.SubModel with
+        | LocalChoosePlayerModel subModel ->
+            match subMsg with
+            | _ -> 
+                Local.ChoosePlayer.update subMsg subModel |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
         | _ -> model, Cmd.none
 
     | NavigateTo page -> 
@@ -77,3 +90,4 @@ let view (model:Model) (dispatch: Msg -> unit) =
     match model.SubModel with
     | HomeModel model -> Home.view model (HomeSceneMsg >> dispatch)
     | QuestionModel model -> Question.view model (QuestionSceneMsg >> dispatch)
+    | LocalChoosePlayerModel model -> Local.ChoosePlayer.view model (LocalChoosePlayerMsg >> dispatch)
