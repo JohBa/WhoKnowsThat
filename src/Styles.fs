@@ -2,6 +2,13 @@ module internal Styles
 
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
 
 let [<Literal>] brandPrimary = "#428bca"
 let [<Literal>] brandInfo = "#5bc0de"
@@ -72,3 +79,18 @@ let button label onPress =
         ButtonProperties.Title label
         ButtonProperties.OnPress onPress
     ] [ ]
+
+let separatorView separatorColor =
+    view 
+     [
+        ViewProperties.Style [
+            FlexStyle.Flex 1.
+            ViewStyle.BackgroundColor "#FFF"
+        ]       
+     ]
+     [
+        view [
+            ViewProperties.Style [
+                FlexStyle.Height 1.
+                ViewStyle.BackgroundColor separatorColor ] ] []
+     ]

@@ -20,7 +20,7 @@ let init () = { StatusText = "" }, Cmd.ofMsg GetQuestions
 // Update
 let update (msg:Msg) model : Model*Cmd<Msg> =
     match msg with
-    | StartGame ->
+    | StartLocalGame ->
         model, Cmd.none // handled in app
 
     | GetQuestions ->

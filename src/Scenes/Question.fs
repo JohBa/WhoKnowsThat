@@ -3,6 +3,7 @@ module Question
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Elmish
+open Fable.Import.ReactNative
 
 
 type Status =
