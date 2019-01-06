@@ -4,13 +4,13 @@ open Fable.Helpers.ReactNative
 open Elmish
 open Fable.Helpers.ReactNative.Props
 open System
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
+open Fable.Helpers.ReactNativeSimpleStore
 
 
 // Model
 type Msg =
-| SaveAndForward
+| Save
+| Forward of Model.Game
 | AcceptInput
 | DeletePlayer of string
 | AddNewPlayer
@@ -22,22 +22,53 @@ type Model = {
     Players: Model.Player list
     StatusText: string
     IsAdding: bool
+    Game: Model.Game
 }
 
-let init () = { PlayerName = ""; StatusText = ""; Players = []; IsAdding = false }, Cmd.none
+let init () = 
+    { 
+        PlayerName = ""
+        StatusText = ""
+        Players = []
+        IsAdding = false
+        Game = {
+            GameId = System.Guid.NewGuid().ToString()
+            Players = []
+            Questions = []
+        }
+    }, Cmd.none
+
+let save (model : Model) = 
+    let game : Model.Game = {
+        GameId = System.Guid.NewGuid().ToString()
+        Players = model.Players
+        Questions = []
+    }
+    DB.add game
 
 // Update
 let update (msg:Msg) model : Model*Cmd<Msg> =
     match msg with
-    | SaveAndForward ->
+    | Save ->
+        let game : Model.Game = {
+            GameId = System.Guid.NewGuid().ToString()
+            Players = model.Players
+            Questions = []
+        }
+        { model with Game = game }, Cmd.ofPromise save model (fun _ -> Forward game) Error
+
+    | Forward game ->
         model, Cmd.none // handled above
 
     | AddNewPlayer ->
         { model with IsAdding = true }, Cmd.none
 
     | AcceptInput -> 
-        let newPlayer : Model.Player = { Id = System.Guid.NewGuid().ToString(); Name = model.PlayerName }
-        let playersList = [newPlayer] @ model.Players
+        let playersList = match model.PlayerName.Length with
+                          | 0 -> model.Players
+                          | _ ->
+                                let newPlayer : Model.Player = { Id = System.Guid.NewGuid().ToString(); Name = model.PlayerName; Score = 0 }
+                                model.Players @ [newPlayer]
         { model with IsAdding = false; Players = playersList; PlayerName = ""; StatusText = "Number of players " + playersList.Length.ToString() }, Cmd.none
 
     | DeletePlayer id ->
@@ -126,6 +157,12 @@ let view (model:Model) (dispatch: Msg -> unit) =
           button [
               ButtonProperties.Title "Add player"
               ButtonProperties.OnPress (fun () -> dispatch AddNewPlayer)
+          ] [ ]
+        ]
+        view [ ViewProperties.Style [ FlexStyle.MarginTop 20. ] ] [
+          button [
+              ButtonProperties.Title "Start the game"
+              ButtonProperties.OnPress (fun () -> dispatch Save)
           ] [ ]
         ]
         Styles.whitespace

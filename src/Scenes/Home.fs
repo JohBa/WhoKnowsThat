@@ -3,6 +3,7 @@ module Home
 open Fable.Helpers.ReactNative
 open Elmish
 open Fable.Helpers.ReactNative.Props
+open Fable.Helpers.ReactNativeSimpleStore
 
 // Model
 type Msg =
@@ -15,7 +16,7 @@ type Model = {
     StatusText: string
 }
 
-let init () = { StatusText = "" }, Cmd.ofMsg GetQuestions
+let init () = { StatusText = "" }, Cmd.ofPromise DB.clear<Model.Game> () (fun _ -> GetQuestions) Error
 
 // Update
 let update (msg:Msg) model : Model*Cmd<Msg> =
@@ -29,12 +30,13 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 
     | Error e ->
         { model with StatusText = string e.Message }, Cmd.none
+
     | QuestionsLoaded qs ->
         { model with StatusText = "Questions loaded: " + qs.ToString()}, Cmd.none
 
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
-      view [ Styles.sceneBackground ]
+    view [ Styles.sceneBackground ]
         [ text 
             [ 
                 Styles.titleText

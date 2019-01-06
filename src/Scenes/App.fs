@@ -2,12 +2,15 @@ module App
 
 open Elmish
 open Fable.PowerPack.Date
+open Fable.Helpers.ReactNative
+open Fable.Helpers.ReactNative.Props
 
 [<RequireQualifiedAccess>]
 type Page =
 | Home
 | Question
 | LocalChoosePlayer
+| LocalQuestion
 
 type Msg =
 | NavigateTo of Page
@@ -17,11 +20,13 @@ type Msg =
 | HomeSceneMsg of Home.Msg
 | QuestionSceneMsg of Question.Msg
 | LocalChoosePlayerMsg of Local.ChoosePlayer.Msg
+| LocalQuestionMsg of Local.Question.Msg
 
 type SubModel =
 | HomeModel of Home.Model
 | QuestionModel of Question.Model
 | LocalChoosePlayerModel of Local.ChoosePlayer.Model
+| LocalQuestionModel of Local.Question.Model
 
 type Model = {
     SubModel : SubModel
@@ -36,6 +41,7 @@ let navigateTo page newStack model =
     | Page.Home -> Home.init() |> wrap HomeModel HomeSceneMsg model
     | Page.Question -> Question.init() |> wrap QuestionModel QuestionSceneMsg model
     | Page.LocalChoosePlayer -> Local.ChoosePlayer.init() |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
+    | Page.LocalQuestion -> Local.Question.init() |> wrap LocalQuestionModel LocalQuestionMsg model
     |> fun (model,cmd) -> { model with NavigationStack = newStack },cmd
 
 let init() =
@@ -66,9 +72,20 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | LocalChoosePlayerModel subModel ->
             match subMsg with
+            | Local.ChoosePlayer.Forward game ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalQuestion) @ Cmd.ofMsg (LocalQuestionMsg (Local.Question.Msg.SetGame game))
             | _ -> 
                 Local.ChoosePlayer.update subMsg subModel |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
         | _ -> model, Cmd.none
+
+    | LocalQuestionMsg subMsg ->
+        match model.SubModel with
+        | LocalQuestionModel subModel ->
+            match subMsg with
+            | _ -> 
+                Local.Question.update subMsg subModel |> wrap LocalQuestionModel LocalQuestionMsg model
+        | _ -> 
+            model, Cmd.none
 
     | NavigateTo page -> 
         navigateTo page (page::model.NavigationStack) model
@@ -79,6 +96,9 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 
     | NavigateBack -> 
         match model.NavigationStack with
+        | Page.LocalQuestion::_ -> 
+            Toast.showShort "Not allowed to go back"
+            model, Cmd.none
         | _::page::rest -> navigateTo page (page::rest) model
         | _ -> model, Cmd.ofMsg ExitApp
 
@@ -91,3 +111,4 @@ let view (model:Model) (dispatch: Msg -> unit) =
     | HomeModel model -> Home.view model (HomeSceneMsg >> dispatch)
     | QuestionModel model -> Question.view model (QuestionSceneMsg >> dispatch)
     | LocalChoosePlayerModel model -> Local.ChoosePlayer.view model (LocalChoosePlayerMsg >> dispatch)
+    | LocalQuestionModel model -> Local.Question.view model (LocalQuestionMsg >> dispatch)

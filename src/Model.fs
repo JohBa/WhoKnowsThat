@@ -18,6 +18,7 @@ type PlayerAnswer = {
 type Player = {
     Id: string
     Name: string
+    Score: int
 }
 
 type GameQuestion = {
