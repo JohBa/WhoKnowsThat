@@ -29,7 +29,7 @@ let init () =
     { 
       Status = NotStarted
       Question = { CorrectAnswer = ""; Question = ""; Language = ""; TrueOrFalse = false }
-      PlayerAnswer = { AnswerId = System.Guid.NewGuid().ToString(); Value = ""; PlayerId = "" } 
+      PlayerAnswer = { Value = ""; PlayerId = ""; AnswerId = System.Guid.NewGuid().ToString() } 
     }, Cmd.ofMsg GetQuestion
 
 let update (msg:Msg) model : Model*Cmd<Msg> =

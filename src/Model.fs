@@ -23,7 +23,7 @@ type Player = {
 
 type GameQuestion = {
     Question: Question
-    Answer: PlayerAnswer
+    Answers: PlayerAnswer list
 }
 
 type Game = {

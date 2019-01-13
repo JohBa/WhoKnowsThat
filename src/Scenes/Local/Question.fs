@@ -3,7 +3,7 @@ module Local.Question
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Elmish
-
+open Fable.Helpers.ReactNativeSimpleStore
 
 type Status =
 | NotStarted
@@ -17,7 +17,9 @@ type Msg =
 | QuestionLoaded of int * Model.Question
 | SaveAnswer
 | SetGame of Model.Game
+| SaveGame
 | NextPlayer
+| Forward of Model.Game
 | Error of exn
 
 type Model = { 
@@ -41,6 +43,15 @@ let init () =
       PlayersLeft = []
     }, Cmd.ofMsg GetQuestion
 
+let updateGame (game : Model.Game) = DB.update (0, game)
+
+let saveGame (game : Model.Game) = 
+    Cmd.ofPromise
+        updateGame
+        game
+        (fun _ -> Forward game)
+        Error
+
 let update (msg:Msg) model : Model*Cmd<Msg> =
     match msg with
     | GetQuestion ->
@@ -50,18 +61,34 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         { model with Game = game; PlayersLeft = game.Players }, Cmd.ofMsg NextPlayer
 
     | NextPlayer ->
-        let playersLeft = model.PlayersLeft.Tail
-        { model with PlayersLeft = playersLeft; CurrentPlayer = model.PlayersLeft.Head }, Cmd.none
+        let tail = model.PlayersLeft.Tail
+        let head = model.PlayersLeft.Head
+        { model with PlayersLeft = tail; CurrentPlayer = head }, Cmd.none
 
-    | QuestionLoaded (i, q) ->
+    | QuestionLoaded (_, q) ->
         { model with Question = q; Status = Complete "" }, Cmd.none
 
     | PlayerAnswerChanged a -> 
         { model with CurrentAnswer = a }, Cmd.none
 
     | SaveAnswer -> 
-        model, Cmd.none
+        let cmd = 
+            match model.PlayersLeft.Length with
+            | 0 -> Cmd.ofMsg SaveGame
+            | _ -> Cmd.ofMsg NextPlayer
+
+        let playerAnswer : Model.PlayerAnswer = { PlayerId = model.CurrentPlayer.Id; Value = model.CurrentAnswer; AnswerId = System.Guid.NewGuid().ToString() }
+        let answers = model.PlayerAnswers @ [playerAnswer]
+        { model with PlayerAnswers = answers; CurrentAnswer = "" }, cmd
     
+    | SaveGame ->
+        let gameQuestion : Model.GameQuestion = { Question = model.Question; Answers = model.PlayerAnswers }
+        let newGame : Model.Game = { model.Game with Questions =  [gameQuestion] @ model.Game.Questions } 
+        { model with Game = newGame }, saveGame newGame
+
+    | Forward game ->
+        model, Cmd.none // handled above
+
     | Error e ->
         { model with Status = Complete e.Message }, Cmd.none
 
