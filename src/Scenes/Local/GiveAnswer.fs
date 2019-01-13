@@ -68,7 +68,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
             Game = game
             PlayersLeft = game.Players
             Question = game.Questions.Head.Question
-            Answers = answers 
+            Answers = Helpers.shuffle answers 
         }, Cmd.ofMsg NextPlayer
 
     | NextPlayer ->
@@ -90,29 +90,62 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
     
     | SaveGame ->
         // TODO: Calculate rest of score and save
+        let newPlayers = 
+            model.Game.Players 
+            |> List.map 
+                (fun p -> 
+                    let playerPoints = 
+                        model.GivenAnswers 
+                        |> List.filter 
+                            (fun p' -> 
+                                match p' with
+                                | CorrectAnswer x -> x.Id = p.Id
+                                | WrongAnswer x -> x.PlayerId = p.Id
+                            )
+                    let score =
+                        playerPoints
+                        |> List.map
+                            (fun p'' -> 
+                                match p'' with
+                                | CorrectAnswer _ -> 2
+                                | WrongAnswer _ -> 3)
+                        |> List.sum
+                    { p with Score = p.Score + score} 
+                )
+        let toastText = newPlayers |> List.fold (fun a player -> sprintf "%s, %s: %i" a player.Name player.Score) "" 
+        Toast.showLong toastText
         model, saveGame model.Game
 
     | Forward game ->
-        Toast.showShort "all players have given their answer"
         model, Cmd.none // handled above
 
     | Error e ->
         { model with Status = Complete e.Message }, Cmd.none
 
 let view (model:Model) (dispatch: Msg -> unit) =
-    view [ Styles.sceneBackground ]
+    let answers = 
+        model.Answers |> List.map (fun a -> 
+            view 
+             [
+                ViewProperties.Style 
+                 [ 
+                    FlexStyle.FlexDirection FlexDirection.Row
+                    FlexStyle.MarginTop 8. 
+                    FlexStyle.MarginBottom 8.
+                    FlexStyle.AlignSelf Alignment.Stretch
+                    FlexStyle.JustifyContent JustifyContent.Center
+                 ] 
+             ] [
+                match a with
+                | QuestionAnswer x -> yield Styles.button x.CorrectAnswer (fun () -> dispatch (SetDecision (a, model.CurrentPlayer)))
+                | PlayerAnswer x -> yield Styles.button x.Value (fun () -> dispatch (SetDecision (a, model.CurrentPlayer)))
+             ]
+        )
+    
+    scrollView [ Styles.sceneBackground ]
         [ text [ Styles.titleText ] model.Question.Question
           text [ Styles.defaultText ] (sprintf "Player: %s" model.CurrentPlayer.Name)
-          textInput [ 
-            TextInput.TextInputProperties.AutoCorrect false
-            TextInput.TextInputProperties.Multiline true
-            TextInput.TextInputProperties.Style [
-                FlexStyle.MarginTop 50.
-                FlexStyle.MarginBottom 50.
-              ]
-            TextInput.TextInputProperties.OnChangeText (PlayerAnswerChanged >> dispatch)
-          ] model.CurrentAnswer
-          Styles.button "Antwort speichern" (fun () -> dispatch SaveAnswer)
+          view [] answers
           text [ Styles.smallText ] 
             (match model.Status with
              | Complete s -> s
