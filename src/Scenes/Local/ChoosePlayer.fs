@@ -31,11 +31,12 @@ let init () =
         StatusText = ""
         Players = []
         IsAdding = false
-        Game = {
-            GameId = System.Guid.NewGuid().ToString()
-            Players = []
-            Questions = []
-        }
+        Game = 
+            {
+                GameId = System.Guid.NewGuid().ToString()
+                Players = []
+                Questions = []
+            }
     }, Cmd.none
 
 let save (model : Model) = 

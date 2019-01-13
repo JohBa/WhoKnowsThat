@@ -8,6 +8,7 @@ open Fable.Helpers.ReactNativeSimpleStore
 type Status =
 | NotStarted
 | InProgress
+| CannotSave
 | Complete of string
 
 // Model
@@ -66,10 +67,14 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         { model with PlayersLeft = tail; CurrentPlayer = head }, Cmd.none
 
     | QuestionLoaded (_, q) ->
-        { model with Question = q; Status = Complete "" }, Cmd.none
+        { model with Question = q; Status = CannotSave }, Cmd.none
 
     | PlayerAnswerChanged a -> 
-        { model with CurrentAnswer = a }, Cmd.none
+        let status =
+            match a.Length with
+            | 0 -> CannotSave
+            | _ -> Complete ""
+        { model with CurrentAnswer = a; Status = status }, Cmd.none
 
     | SaveAnswer -> 
         let cmd = 
@@ -79,7 +84,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 
         let playerAnswer : Model.PlayerAnswer = { PlayerId = model.CurrentPlayer.Id; Value = model.CurrentAnswer; AnswerId = System.Guid.NewGuid().ToString() }
         let answers = model.PlayerAnswers @ [playerAnswer]
-        { model with PlayerAnswers = answers; CurrentAnswer = "" }, cmd
+        { model with PlayerAnswers = answers; CurrentAnswer = ""; Status = CannotSave }, cmd
     
     | SaveGame ->
         let gameQuestion : Model.GameQuestion = { Question = model.Question; Answers = model.PlayerAnswers }
@@ -93,6 +98,11 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         { model with Status = Complete e.Message }, Cmd.none
 
 let view (model:Model) (dispatch: Msg -> unit) =
+    let isDisabled = 
+        match model.Status with
+        | CannotSave -> true
+        | _ -> false
+
     view [ Styles.sceneBackground ]
         [ text [ Styles.titleText ] model.Question.Question
           text [ Styles.defaultText ] (sprintf "Player: %s" model.CurrentPlayer.Name)
@@ -105,7 +115,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
               ]
             TextInput.TextInputProperties.OnChangeText (PlayerAnswerChanged >> dispatch)
           ] model.CurrentAnswer
-          Styles.button "Antwort speichern" (fun () -> dispatch SaveAnswer)
+          Styles.buttonWithDisabled "Antwort speichern" isDisabled (fun () -> dispatch SaveAnswer)
           text [ Styles.smallText ] 
             (match model.Status with
              | Complete s -> s

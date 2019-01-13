@@ -2,6 +2,7 @@ module internal Styles
 
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
 
 let [<Literal>] brandPrimary = "#428bca"
 let [<Literal>] brandInfo = "#5bc0de"
@@ -67,11 +68,15 @@ let viewPagerBackground<'a> =
         ViewStyle.BackgroundColor backgroundColor
       ]
       
-let button label onPress =
+let buttonWithDisabled label isDisabled onPress =
     button [
+        ButtonProperties.Disabled isDisabled
         ButtonProperties.Title label
         ButtonProperties.OnPress onPress
     ] [ ]
+
+let button label onPress =
+    buttonWithDisabled label false onPress
 
 let separatorView separatorColor =
     view 
