@@ -1,14 +1,32 @@
 [
-    {
-      "Question": "Der/Die/Das Hunt ist ein...",
-      "CorrectAnswer": "Ein offener, kastenförmiger Förderwagen",
-      "Language": "de",
-      "TrueOrFalse": false
-    },
-    {
-      "Question": "Was ist in Baltimore (USA) seit 1898 verboten?",
-      "CorrectAnswer": "Mit ärmellosen Hemden durch den Park zu laufen",
-      "Language": "de",
-      "TrueOrFalse": false
-    }
-  ]
+  {
+    "Question": "Der/Die/Das Hunt ist ein...",
+    "CorrectAnswer": "Ein offener, kastenförmiger Förderwagen",
+    "Language": "de",
+    "TrueOrFalse": false
+  },
+  {
+    "Question": "Was ist in Baltimore (USA) seit 1898 verboten?",
+    "CorrectAnswer": "Mit ärmellosen Hemden durch den Park zu laufen",
+    "Language": "de",
+    "TrueOrFalse": false
+  },
+  {
+    "Question": "Was war das besondere als Adele 2007 auf dem South by Southwest Festival in Texas auftrat?",
+    "CorrectAnswer": "Sie hatte nur zwischen drei und vier Zuschauer",
+    "Language": "de",
+    "TrueOrFalse": false
+  },
+  {
+    "Question": "Was ist das besondere am Symphonieorchester von Monaco?",
+    "CorrectAnswer": "Es hat mehr Mitglieder als die Armee",
+    "Language": "de",
+    "TrueOrFalse": false
+  },
+  {
+    "Question": "Was trifft auf gestresste Koalas zu?",
+    "CorrectAnswer": "Sie bekommen Schluckauf",
+    "Language": "de",
+    "TrueOrFalse": false
+  }
+ ]
