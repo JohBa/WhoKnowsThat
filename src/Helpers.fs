@@ -1,40 +1,17 @@
 module Helpers
 
-open System
-  
-// -- | Auxiliary recursive drop function
-let rec private drop' i l1 p l2 =
-    if List.length l2 = List.length l1 - 1 then l2
-    else 
-        let p = if p = i then p+1  else p 
-        drop' i l1 (p+1) (List.append l2 [(List.nth l1 p)])
+let rng = new System.Random()
 
-// -- | Removes the the nth element from list
-let private drop i l =
-    drop' i l 0 []        
+let shuffle l = 
+    let (org:_[]) = l |> List.toArray
+    let arr = Array.copy org
+    let max = (arr.Length - 1)
+    let randomSwap (arr:_[]) i =
+        let pos = rng.Next(max)
+        let tmp = arr.[pos]
+        arr.[pos] <- arr.[i]
+        arr.[i] <- tmp
+        arr
+   
+    [|0..max|] |> Array.fold randomSwap arr |> Array.toList
 
-// -- | Pop one element from a specific list position
-let private pop i l =
-    match l with
-    | [] -> ([],[])
-    | h :: t when i >= 0 -> 
-        let e = [l.Item i]
-        let ll = drop i l
-        (e,ll)
-    | _ -> ([],[])
-
-// -- | Generate random number within interval a-b with seed s
-let private myrandom a b s =
-    let r = System.Random(s)
-    r.Next(a, b)
-
-// -- | Shuffle' auxiliary
-let rec private shuffle' r l1 l2 =
-    let len = List.length l1
-    let t = pop r l1
-    if len = 0 then l2
-    else shuffle' (myrandom 0 (len-1) r) (snd t) (List.append l2 (fst t))  
-
-// -- | Shuffle a list
-let shuffle l =
-    shuffle' (myrandom 0 ((List.length l)-1) 0) l []
