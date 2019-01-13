@@ -4,9 +4,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ReleaseNotes.fs" />
+    <Compile Include="Helpers.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Styles.fs" />
+    <Compile Include="Scenes/Local/GiveAnswer.fs" />
     <Compile Include="Scenes/Local/Question.fs" />
     <Compile Include="Scenes/Local/ChoosePlayer.fs" />
     <Compile Include="Scenes/Question.fs" />

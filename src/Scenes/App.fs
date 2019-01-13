@@ -11,6 +11,7 @@ type Page =
 | Question
 | LocalChoosePlayer
 | LocalQuestion
+| LocalGiveAnswer
 
 type Msg =
 | NavigateTo of Page
@@ -21,12 +22,14 @@ type Msg =
 | QuestionSceneMsg of Question.Msg
 | LocalChoosePlayerMsg of Local.ChoosePlayer.Msg
 | LocalQuestionMsg of Local.Question.Msg
+| LocalGiveAnswerMsg of Local.GiveAnswer.Msg
 
 type SubModel =
 | HomeModel of Home.Model
 | QuestionModel of Question.Model
 | LocalChoosePlayerModel of Local.ChoosePlayer.Model
 | LocalQuestionModel of Local.Question.Model
+| LocalGiveAnswerModel of Local.GiveAnswer.Model
 
 type Model = {
     SubModel : SubModel
@@ -42,6 +45,7 @@ let navigateTo page newStack model =
     | Page.Question -> Question.init() |> wrap QuestionModel QuestionSceneMsg model
     | Page.LocalChoosePlayer -> Local.ChoosePlayer.init() |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
     | Page.LocalQuestion -> Local.Question.init() |> wrap LocalQuestionModel LocalQuestionMsg model
+    | Page.LocalGiveAnswer -> Local.GiveAnswer.init() |> wrap LocalGiveAnswerModel LocalGiveAnswerMsg model
     |> fun (model,cmd) -> { model with NavigationStack = newStack },cmd
 
 let init() =
@@ -82,8 +86,19 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | LocalQuestionModel subModel ->
             match subMsg with
+            | Local.Question.Forward game ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalGiveAnswer) @ Cmd.ofMsg (LocalGiveAnswerMsg (Local.GiveAnswer.Msg.SetGame game))
             | _ -> 
                 Local.Question.update subMsg subModel |> wrap LocalQuestionModel LocalQuestionMsg model
+        | _ -> 
+            model, Cmd.none
+
+    | LocalGiveAnswerMsg subMsg ->
+        match model.SubModel with
+        | LocalGiveAnswerModel subModel ->
+            match subMsg with
+            | _ -> 
+                Local.GiveAnswer.update subMsg subModel |> wrap LocalGiveAnswerModel LocalGiveAnswerMsg model
         | _ -> 
             model, Cmd.none
 
@@ -112,3 +127,4 @@ let view (model:Model) (dispatch: Msg -> unit) =
     | QuestionModel model -> Question.view model (QuestionSceneMsg >> dispatch)
     | LocalChoosePlayerModel model -> Local.ChoosePlayer.view model (LocalChoosePlayerMsg >> dispatch)
     | LocalQuestionModel model -> Local.Question.view model (LocalQuestionMsg >> dispatch)
+    | LocalGiveAnswerModel model -> Local.GiveAnswer.view model (LocalGiveAnswerMsg >> dispatch)

@@ -15,6 +15,7 @@ let createQuestions() =
             // Fetch demo data
             let questions: Question[] =
                 localResource "${entryDir}/../data/Questions.json"
+
             // let! requests =
             //     Fetch.fetchAs<LocationCheckRequest[]>
             //         "https://raw.githubusercontent.com/fsprojects/fable-react_native-demo/master/demodata/LocationCheckRequests.json" []
