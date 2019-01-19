@@ -15,3 +15,6 @@ let shuffle l =
    
     [|0..max|] |> Array.fold randomSwap arr |> Array.toList
 
+type ShadowOffset =
+      { width: float
+        height: float }

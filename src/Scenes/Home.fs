@@ -4,11 +4,7 @@ open Fable.Helpers.ReactNative
 open Elmish
 open Fable.Helpers.ReactNative.Props
 open Fable.Helpers.ReactNativeSimpleStore
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Helpers.ReactNative.ImageEditor
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
+open Elmish.React
 open Fable.Import.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Fable.Import.ReactNative
@@ -49,7 +45,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
-    //let shadow : Fable.Helpers.ReactNative.Props.Sha = {}
+    let shadow : Helpers.ShadowOffset = {width = 0.; height = 4.}
     view [
         ViewProperties.Style 
              [ 
@@ -71,8 +67,9 @@ let view (model:Model) (dispatch: Msg -> unit) =
                 FlexStyle.FlexDirection FlexDirection.Row
                 ViewStyle.ShadowColor "#000"
                 ViewStyle.ShadowOpacity 0.8
-                //ViewStyle.ShadowOffset 
-                ViewStyle.ShadowRadius 3.
+                ViewStyle.ShadowOffset shadow
+                ViewStyle.ShadowRadius 8.
+                ViewStyle.Elevation 4.
                 FlexStyle.PaddingLeft 10.
                 FlexStyle.PaddingRight 10.
                 ViewStyle.BackgroundColor "#eee"
@@ -80,18 +77,43 @@ let view (model:Model) (dispatch: Msg -> unit) =
              ] 
          ] 
          [
-            touchableWithoutFeedback [
-                TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
-                TouchableWithoutFeedbackProperties.Style [ FlexStyle.MarginRight 25.]
-             ] [ image 
+            view 
+             [ 
+                ViewProperties.Style 
+                 [
+                    FlexStyle.Flex 1.
+                    FlexStyle.FlexDirection FlexDirection.Row
+                    FlexStyle.JustifyContent JustifyContent.FlexStart
+                    FlexStyle.PaddingLeft 10.
+                 ]
+             ]
+             [
+                text [ TextProperties.Style [ TextStyle.FontSize 14.; TextStyle.FontWeight FontWeight.Bold ] ] "Who Knows That"
+             ]
+            view 
+             [ 
+                ViewProperties.Style 
+                 [
+                    FlexStyle.JustifyContent JustifyContent.FlexEnd
+                    FlexStyle.FlexDirection FlexDirection.Row
+                    FlexStyle.PaddingLeft 10.
+                    FlexStyle.PaddingRight 5.
+                    FlexStyle.Flex 1.
+                 ]
+             ]
+             [
+                touchableWithoutFeedback [
+                    TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                ] [ image 
                   [ Source (localImage "${entryDir}/../images/bars_48x48.png")
                     ImageProperties.ResizeMode ResizeMode.Contain
                     ImageProperties.Style [
                       FlexStyle.Height 20.
                       FlexStyle.AlignSelf Alignment.Center
                     ]
-                  ] ]
-            text [ TextProperties.Style [ TextStyle.FontSize 14.; TextStyle.FontWeight FontWeight.Bold ] ] "Who Knows That"
+                  ] 
+                ] 
+             ]
          ]
         view 
          [ 
