@@ -8,6 +8,13 @@ open Elmish.React
 open Fable.Import.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
 
 // Model
 type Msg =
@@ -88,7 +95,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
                  ]
              ]
              [
-                text [ TextProperties.Style [ TextStyle.FontSize 14.; TextStyle.FontWeight FontWeight.Bold ] ] "Who Knows That"
+                text [ TextProperties.Style [ TextStyle.FontSize 17.; TextStyle.FontWeight FontWeight.Bold ] ] "Who Knows That"
              ]
             view 
              [ 
@@ -102,7 +109,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
                  ]
              ]
              [
-                touchableWithoutFeedback [
+                touchableNativeFeedback [
                     TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
                 ] [ image 
                   [ Source (localImage "${entryDir}/../images/bars_48x48.png")
@@ -112,8 +119,31 @@ let view (model:Model) (dispatch: Msg -> unit) =
                       FlexStyle.AlignSelf Alignment.Center
                     ]
                   ] 
-                ] 
+                ]
              ]
+         ]
+        view 
+         [
+            ViewProperties.Style
+             [
+                FlexStyle.ZIndex 99.
+                FlexStyle.Position Position.Absolute
+                ViewStyle.BackgroundColor "#ddd"
+                ViewStyle.Elevation 5.
+                FlexStyle.MarginTop 10.
+                FlexStyle.MarginRight 10.
+                FlexStyle.MinWidth 150.
+                FlexStyle.MaxWidth 160.
+                FlexStyle.Right 0.
+             ]
+         ] 
+         [
+            view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                text [] "foofsgsgsgagagagagagsgs"
+            ]
+            view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                text [] "foo"
+            ]
          ]
         view 
          [ 
