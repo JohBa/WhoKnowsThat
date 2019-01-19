@@ -11,20 +11,29 @@ type Msg =
 | StartLocalGame
 | MenuTouched
 | GetQuestions
+| HideMenu
+| ShowMenu
 | QuestionsLoaded of int
 | Error of exn
 
 type Model = { 
     StatusText: string
+    ShowMenu: bool
 }
 
-let init () = { StatusText = "" }, Cmd.ofPromise DB.clear<Model.Game> () (fun _ -> GetQuestions) Error
+let init () = { StatusText = ""; ShowMenu = false }, Cmd.ofPromise DB.clear<Model.Game> () (fun _ -> GetQuestions) Error
 
 // Update
 let update (msg:Msg) model : Model*Cmd<Msg> =
     match msg with
     | StartLocalGame ->
         model, Cmd.none // handled in app
+
+    | HideMenu ->
+        { model with ShowMenu = false }, Cmd.none
+
+    | ShowMenu ->
+        { model with ShowMenu = true }, Cmd.none
 
     | MenuTouched -> 
         Toast.showLong "menu touched"
@@ -43,46 +52,70 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
     let shadow : Helpers.ShadowOffset = {width = 0.; height = 4.}
-    let showMenu = false
-    let menu = 
-        match showMenu with
-        | false -> text [ ] ""
-        | true -> 
-            view 
+   
+    let menu =
+        let container element =
+            touchableWithoutFeedback [ TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch HideMenu) ]
              [
-                ViewProperties.Style
+                view 
                  [
-                    FlexStyle.ZIndex 99.
-                    FlexStyle.Position Position.Absolute
-                    ViewStyle.BackgroundColor "#ddd"
-                    ViewStyle.Elevation 5.
-                    FlexStyle.MarginTop 10.
-                    FlexStyle.MarginRight 10.
-                    FlexStyle.MinWidth 150.
-                    FlexStyle.MaxWidth 160.
-                    FlexStyle.Right 0.
-                 ]
-             ] 
-             [
-                touchableNativeFeedback 
-                 [
-                    TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                    ViewProperties.Style 
+                     [ 
+                        ViewStyle.Elevation 100.
+                        FlexStyle.Position Position.Absolute
+                        FlexStyle.Right 0.
+                        FlexStyle.Left 0.
+                        FlexStyle.Top 0.
+                        FlexStyle.Bottom 0.
+                        FlexStyle.ZIndex 99.
+                        ViewStyle.BackgroundColor "transparent"
+                     ]
                  ]
                  [
-                    view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
-                        text [] "foofsgsgsgagagagagagsgs"
-                    ]
-                 ]
-                touchableNativeFeedback
-                 [
-                    TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
-                 ]
-                 [
-                    view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
-                        text [] "foofsgsgsgagagagagagsgs"
-                    ]
+                    element
                  ]
              ]
+        let menuRenderer =
+             view 
+              [
+                 ViewProperties.Style
+                  [
+                     FlexStyle.ZIndex 999.
+                     FlexStyle.Position Position.Absolute
+                     ViewStyle.BackgroundColor "#ddd"
+                     ViewStyle.Elevation 5.
+                     FlexStyle.MarginTop 10.
+                     FlexStyle.MarginRight 10.
+                     FlexStyle.MinWidth 150.
+                     FlexStyle.MaxWidth 160.
+                     FlexStyle.Right 0.
+                  ]
+              ] 
+              [
+                 touchableNativeFeedback 
+                  [
+                     TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                  ]
+                  [
+                     view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                         text [] "foofsgsgsgagagagagagsgs"
+                     ]
+                  ]
+                 touchableNativeFeedback
+                  [
+                     TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                  ]
+                  [
+                     view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                         text [] "foofsgsgsgagagagagagsgs"
+                     ]
+                  ]
+              ]
+        match model.ShowMenu with
+        | false -> view [] []
+        | true -> 
+            container menuRenderer
+            
 
     view [
         ViewProperties.Style 
@@ -142,7 +175,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
              [
                 view [ViewProperties.Style [ ViewStyle.BorderRadius 40.; ViewStyle.Overflow Overflow.Hidden ]] [
                     touchableNativeFeedback [
-                        TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                        TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch ShowMenu)
                     ] [ view [ ViewProperties.Style [ FlexStyle.Height 40.; FlexStyle.Width 40.; FlexStyle.JustifyContent JustifyContent.Center ]] [
                          image 
                           [ Source (localImage "${entryDir}/../images/bars_48x48.png")
