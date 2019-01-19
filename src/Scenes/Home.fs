@@ -5,16 +5,6 @@ open Elmish
 open Fable.Helpers.ReactNative.Props
 open Fable.Helpers.ReactNativeSimpleStore
 open Elmish.React
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
 
 // Model
 type Msg =
@@ -109,16 +99,20 @@ let view (model:Model) (dispatch: Msg -> unit) =
                  ]
              ]
              [
-                touchableNativeFeedback [
-                    TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
-                ] [ image 
-                  [ Source (localImage "${entryDir}/../images/bars_48x48.png")
-                    ImageProperties.ResizeMode ResizeMode.Contain
-                    ImageProperties.Style [
-                      FlexStyle.Height 20.
-                      FlexStyle.AlignSelf Alignment.Center
+                view [ViewProperties.Style [ ViewStyle.BorderRadius 40.; ViewStyle.Overflow Overflow.Hidden ]] [
+                    touchableNativeFeedback [
+                        TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                    ] [ view [ ViewProperties.Style [ FlexStyle.Height 40.; FlexStyle.Width 40.; FlexStyle.JustifyContent JustifyContent.Center ]] [
+                         image 
+                          [ Source (localImage "${entryDir}/../images/bars_48x48.png")
+                            ImageProperties.ResizeMode ResizeMode.Contain
+                            ImageProperties.Style [
+                              FlexStyle.Height 15.
+                              FlexStyle.AlignSelf Alignment.Center
+                            ]
+                          ]
+                        ] 
                     ]
-                  ] 
                 ]
              ]
          ]
@@ -138,12 +132,24 @@ let view (model:Model) (dispatch: Msg -> unit) =
              ]
          ] 
          [
-            view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
-                text [] "foofsgsgsgagagagagagsgs"
-            ]
-            view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
-                text [] "foo"
-            ]
+            touchableNativeFeedback 
+             [
+                TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+             ]
+             [
+                view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                    text [] "foofsgsgsgagagagagagsgs"
+                ]
+             ]
+            touchableNativeFeedback
+             [
+                TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+             ]
+             [
+                view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                    text [] "foofsgsgsgagagagagagsgs"
+                ]
+             ]
          ]
         view 
          [ 
