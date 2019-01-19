@@ -43,6 +43,47 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
     let shadow : Helpers.ShadowOffset = {width = 0.; height = 4.}
+    let showMenu = false
+    let menu = 
+        match showMenu with
+        | false -> text [ ] ""
+        | true -> 
+            view 
+             [
+                ViewProperties.Style
+                 [
+                    FlexStyle.ZIndex 99.
+                    FlexStyle.Position Position.Absolute
+                    ViewStyle.BackgroundColor "#ddd"
+                    ViewStyle.Elevation 5.
+                    FlexStyle.MarginTop 10.
+                    FlexStyle.MarginRight 10.
+                    FlexStyle.MinWidth 150.
+                    FlexStyle.MaxWidth 160.
+                    FlexStyle.Right 0.
+                 ]
+             ] 
+             [
+                touchableNativeFeedback 
+                 [
+                    TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                 ]
+                 [
+                    view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                        text [] "foofsgsgsgagagagagagsgs"
+                    ]
+                 ]
+                touchableNativeFeedback
+                 [
+                    TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
+                 ]
+                 [
+                    view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                        text [] "foofsgsgsgagagagagagsgs"
+                    ]
+                 ]
+             ]
+
     view [
         ViewProperties.Style 
              [ 
@@ -116,41 +157,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
                 ]
              ]
          ]
-        view 
-         [
-            ViewProperties.Style
-             [
-                FlexStyle.ZIndex 99.
-                FlexStyle.Position Position.Absolute
-                ViewStyle.BackgroundColor "#ddd"
-                ViewStyle.Elevation 5.
-                FlexStyle.MarginTop 10.
-                FlexStyle.MarginRight 10.
-                FlexStyle.MinWidth 150.
-                FlexStyle.MaxWidth 160.
-                FlexStyle.Right 0.
-             ]
-         ] 
-         [
-            touchableNativeFeedback 
-             [
-                TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
-             ]
-             [
-                view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
-                    text [] "foofsgsgsgagagagagagsgs"
-                ]
-             ]
-            touchableNativeFeedback
-             [
-                TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch MenuTouched)
-             ]
-             [
-                view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
-                    text [] "foofsgsgsgagagagagagsgs"
-                ]
-             ]
-         ]
+        menu
         view 
          [ 
             ViewProperties.Style 
