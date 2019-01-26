@@ -3,10 +3,7 @@ module Local.Score
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Elmish
-open Fable.Helpers.ReactNativeSimpleStore
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
+open System
 
 type Status =
 | NotStarted
@@ -23,6 +20,11 @@ type Msg =
 type Model = { 
     Status: Status
     Game: Model.Game
+}
+
+type PlayerRank = {
+    Player: Model.Player
+    Rank: int
 }
 
 let init () = 
@@ -43,11 +45,14 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         { model with Status = Complete e.Message }, Cmd.none
 
 let view (model:Model) (dispatch: Msg -> unit) =
-    let sortedPlayers = model.Game.Players |> List.sortBy (fun p -> p.Score)
+    let sortedPlayers = 
+        model.Game.Players 
+        |> List.sortBy (fun p -> p.Score)
+        |> List.mapi (fun i p -> {Player = p; Rank = i})
 
-    let playerScore (player: Model.Player) (rank: int) = 
+    let renderPlayerScore (player: PlayerRank) = 
         let rankBg, rankColor =
-            match rank with
+            match player.Rank with
             | 1 -> "#ffdb4a", "#a98700"
             | 2 -> "#acb6bf", "#586169"
             | 3 -> "#d29246", "#9a6428"
@@ -81,7 +86,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
                  ]
              ]
              [
-                text [] (rank.ToString())
+                text [] (player.Rank.ToString())
              ]
             view 
              [
@@ -95,7 +100,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
                  ]
              ]
              [
-                text [] player.Name
+                text [] player.Player.Name
              ]
             view 
              [
@@ -111,25 +116,19 @@ let view (model:Model) (dispatch: Msg -> unit) =
                  ]
              ]
              [
-                text [] player.Score
+                text [] (player.Player.Score.ToString())
              ]
          ]
 
-    
-
     scrollView [ Styles.sceneBackground ]
-        [ text [ Styles.titleText ] model.Question.Question
-          text [ Styles.defaultText ] (sprintf "Player: %s" model.CurrentPlayer.Name)
-          textInput [ 
-            TextInput.TextInputProperties.AutoCorrect false
-            TextInput.TextInputProperties.Multiline true
-            TextInput.TextInputProperties.Style [
-                FlexStyle.MarginTop 50.
-                FlexStyle.MarginBottom 50.
-              ]
-            TextInput.TextInputProperties.OnChangeText (PlayerAnswerChanged >> dispatch)
-          ] model.CurrentAnswer
-          Styles.buttonWithDisabled "Antwort speichern" isDisabled (fun () -> dispatch SaveAnswer)
+        [ text [ Styles.titleText ] "Current Score"
+          view [ ViewProperties.Style [ FlexStyle.MarginTop 40.; FlexStyle.MarginBottom 40. ] ] [
+            flatList (sortedPlayers |> List.toArray) [
+                KeyExtractor (Func<_,_,_>(fun (v) _ -> v.Rank.ToString()))
+                RenderItem (Func<_,_>(fun v -> renderPlayerScore v.item))
+                ItemSeparatorComponent (Styles.separatorView "#000")
+            ] ]
+          Styles.button "Nächste Frage" (fun () -> dispatch (Forward model.Game))
           text [ Styles.smallText ] 
             (match model.Status with
              | Complete s -> s
