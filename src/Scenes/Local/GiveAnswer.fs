@@ -89,7 +89,6 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         { model with GivenAnswers = [givenAnswer] @ model.GivenAnswers }, cmd
     
     | SaveGame ->
-        // TODO: Calculate rest of score and save
         let newPlayers = 
             model.Game.Players 
             |> List.map 
@@ -112,9 +111,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
                         |> List.sum
                     { p with Score = p.Score + score} 
                 )
-        let toastText = newPlayers |> List.fold (fun a player -> sprintf "%s, %s: %i" a player.Name player.Score) "" 
-        Toast.showLong toastText
-        model, saveGame model.Game
+        let newGame = { model.Game with Players = newPlayers }
+        { model with Game = newGame }, saveGame model.Game
 
     | Forward game ->
         model, Cmd.none // handled above
