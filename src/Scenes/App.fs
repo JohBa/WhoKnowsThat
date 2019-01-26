@@ -12,6 +12,7 @@ type Page =
 | LocalChoosePlayer
 | LocalQuestion
 | LocalGiveAnswer
+| LocalScore
 
 type Msg =
 | NavigateTo of Page
@@ -23,6 +24,7 @@ type Msg =
 | LocalChoosePlayerMsg of Local.ChoosePlayer.Msg
 | LocalQuestionMsg of Local.Question.Msg
 | LocalGiveAnswerMsg of Local.GiveAnswer.Msg
+| LocalScoreMsg of Local.Score.Msg
 
 type SubModel =
 | HomeModel of Home.Model
@@ -30,6 +32,7 @@ type SubModel =
 | LocalChoosePlayerModel of Local.ChoosePlayer.Model
 | LocalQuestionModel of Local.Question.Model
 | LocalGiveAnswerModel of Local.GiveAnswer.Model
+| LocalScoreModel of Local.Score.Model
 
 type Model = {
     SubModel : SubModel
@@ -46,6 +49,7 @@ let navigateTo page newStack model =
     | Page.LocalChoosePlayer -> Local.ChoosePlayer.init() |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
     | Page.LocalQuestion -> Local.Question.init() |> wrap LocalQuestionModel LocalQuestionMsg model
     | Page.LocalGiveAnswer -> Local.GiveAnswer.init() |> wrap LocalGiveAnswerModel LocalGiveAnswerMsg model
+    | Page.LocalScore -> Local.Score.init() |> wrap LocalScoreModel LocalScoreMsg model
     |> fun (model,cmd) -> { model with NavigationStack = newStack },cmd
 
 let init() =
@@ -97,8 +101,21 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | LocalGiveAnswerModel subModel ->
             match subMsg with
+            | Local.GiveAnswer.Forward game ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalScore) @ Cmd.ofMsg (LocalScoreMsg (Local.Score.Msg.SetGame game))
             | _ -> 
                 Local.GiveAnswer.update subMsg subModel |> wrap LocalGiveAnswerModel LocalGiveAnswerMsg model
+        | _ -> 
+            model, Cmd.none
+    
+    | LocalScoreMsg subMsg ->
+        match model.SubModel with
+        | LocalScoreModel subModel ->
+            match subMsg with
+            | Local.Score.Forward game ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalQuestion) @ Cmd.ofMsg (LocalQuestionMsg (Local.Question.Msg.SetGame game))
+            | _ -> 
+                Local.Score.update subMsg subModel |> wrap LocalScoreModel LocalScoreMsg model
         | _ -> 
             model, Cmd.none
 
@@ -128,3 +145,4 @@ let view (model:Model) (dispatch: Msg -> unit) =
     | LocalChoosePlayerModel model -> Local.ChoosePlayer.view model (LocalChoosePlayerMsg >> dispatch)
     | LocalQuestionModel model -> Local.Question.view model (LocalQuestionMsg >> dispatch)
     | LocalGiveAnswerModel model -> Local.GiveAnswer.view model (LocalGiveAnswerMsg >> dispatch)
+    | LocalScoreModel model -> Local.Score.view model (LocalScoreMsg >> dispatch)
