@@ -103,7 +103,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
         | CannotSave -> true
         | _ -> false
 
-    view [ Styles.sceneBackground ]
+    scrollView [ Styles.sceneBackground ]
         [ text [ Styles.titleText ] model.Question.Question
           text [ Styles.defaultText ] (sprintf "Player: %s" model.CurrentPlayer.Name)
           textInput [ 

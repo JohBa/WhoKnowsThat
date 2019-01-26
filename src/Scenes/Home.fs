@@ -117,7 +117,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
             container menuRenderer
             
 
-    view [
+    scrollView [
         ViewProperties.Style 
              [ 
                 FlexStyle.AlignSelf Alignment.Stretch

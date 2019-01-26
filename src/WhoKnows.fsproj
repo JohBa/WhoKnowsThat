@@ -8,6 +8,7 @@
     <Compile Include="Model.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Styles.fs" />
+    <Compile Include="Scenes/Local/Score.fs" />
     <Compile Include="Scenes/Local/GiveAnswer.fs" />
     <Compile Include="Scenes/Local/Question.fs" />
     <Compile Include="Scenes/Local/ChoosePlayer.fs" />
