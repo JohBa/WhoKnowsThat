@@ -4,9 +4,6 @@ open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Elmish
 open System
-open Fable.Import.ReactNative
-open Fable.Helpers.ReactNative.Props
-open Fable.Import.ReactNative
 
 type Status =
 | NotStarted
