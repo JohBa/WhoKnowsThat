@@ -6,6 +6,7 @@ open Elmish
 open System
 open Fable.Import.ReactNative
 open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
 
 type Status =
 | NotStarted
@@ -53,68 +54,74 @@ let view (model:Model) (dispatch: Msg -> unit) =
         |> List.mapi (fun i p -> {Player = p; Rank = i})
 
     let renderPlayerScore (player: PlayerRank) = 
+        let rank = player.Rank + 1
         let rankBg, rankColor =
             match player.Rank with
             | 0 -> "#ffdb4a", "#a98700"
             | 1 -> "#acb6bf", "#586169"
             | 2 -> "#d29246", "#9a6428"
             | _ -> "#ced5db", "#848f98"
-        view 
+        view []
          [
-            ViewProperties.Style 
-             [
-                FlexStyle.AlignSelf Alignment.Stretch
-                FlexStyle.AlignItems ItemAlignment.Center
-                FlexStyle.FlexDirection FlexDirection.Row
-                FlexStyle.PaddingLeft 10.
-                FlexStyle.PaddingRight 10.
-                ViewStyle.BackgroundColor "#eee"
-                FlexStyle.Height 55.
-             ]
-         ]
-         [
-            view 
-             [
-                ViewProperties.Style 
-                 [
-                    FlexStyle.Flex 1.
-                    FlexStyle.FlexDirection FlexDirection.Row
-                    FlexStyle.JustifyContent JustifyContent.FlexStart
-                    FlexStyle.PaddingLeft 10.
-                    FlexStyle.Width 20.
-                    ViewStyle.BackgroundColor rankBg
-                 ]
-             ]
-             [
-                text [ TextProperties.Style [TextStyle.Color rankColor; TextStyle.FontSize 19.]] (player.Rank.ToString())
-             ]
-            view 
-             [
-                ViewProperties.Style 
-                 [
-                    FlexStyle.Flex 1.
-                    FlexStyle.FlexDirection FlexDirection.Row
-                    FlexStyle.JustifyContent JustifyContent.Center
-                    FlexStyle.PaddingLeft 10.
-                 ]
-             ]
-             [
-                text [ TextProperties.Style [TextStyle.Color rankColor]] player.Player.Name
-             ]
-            view 
-             [
-                ViewProperties.Style 
-                 [
-                    FlexStyle.Flex 1.
-                    FlexStyle.FlexDirection FlexDirection.Row
-                    FlexStyle.JustifyContent JustifyContent.FlexEnd
-                    FlexStyle.PaddingLeft 10.
-                    FlexStyle.Width 30.
-                 ]
-             ]
-             [
-                text [ TextProperties.Style [TextStyle.Color rankColor; TextStyle.FontSize 18.]] (player.Player.Score.ToString())
-             ]
+          view 
+           [
+              ViewProperties.Style 
+               [
+                  FlexStyle.AlignItems ItemAlignment.Center
+                  FlexStyle.FlexDirection FlexDirection.Row
+                  ViewStyle.BackgroundColor "#eee"
+                  FlexStyle.Height 55.
+               ]
+           ]
+           [
+              view 
+               [
+                  ViewProperties.Style 
+                   [
+                      FlexStyle.Flex 1.
+                      FlexStyle.AlignSelf Alignment.Stretch
+                      FlexStyle.FlexDirection FlexDirection.Row
+                      FlexStyle.JustifyContent JustifyContent.Center
+                      FlexStyle.AlignItems ItemAlignment.Center
+                      FlexStyle.MaxWidth 45.
+                      ViewStyle.BackgroundColor rankBg
+                   ]
+               ]
+               [
+                  text [ TextProperties.Style [TextStyle.Color rankColor; TextStyle.FontSize 19.]] (rank.ToString())
+               ]
+              view 
+               [
+                  ViewProperties.Style 
+                   [
+                      FlexStyle.Flex 1.
+                      FlexStyle.AlignSelf Alignment.Stretch
+                      FlexStyle.FlexDirection FlexDirection.Row
+                      FlexStyle.JustifyContent JustifyContent.FlexStart
+                      FlexStyle.AlignItems ItemAlignment.Center
+                      FlexStyle.PaddingLeft 10.
+                   ]
+               ]
+               [
+                  text [ TextProperties.Style [TextStyle.Color rankColor]] player.Player.Name
+               ]
+              view 
+               [
+                  ViewProperties.Style 
+                   [
+                      FlexStyle.Flex 1.
+                      FlexStyle.AlignSelf Alignment.Stretch
+                      FlexStyle.FlexDirection FlexDirection.Row
+                      FlexStyle.JustifyContent JustifyContent.Center
+                      FlexStyle.AlignItems ItemAlignment.Center
+                      FlexStyle.MaxWidth 55.
+                   ]
+               ]
+               [
+                  text [ TextProperties.Style [TextStyle.Color rankColor; TextStyle.FontSize 18.]] (player.Player.Score.ToString())
+               ]
+           ]           
+          Styles.separatorView "#ced5db"
          ]
 
     scrollView [ Styles.sceneBackground ]
@@ -123,7 +130,6 @@ let view (model:Model) (dispatch: Msg -> unit) =
             flatList (sortedPlayers |> List.toArray) [
                 KeyExtractor (Func<_,_,_>(fun (v) _ -> v.Rank.ToString()))
                 RenderItem (Func<_,_>(fun v -> renderPlayerScore v.item))
-                ItemSeparatorComponent (Styles.separatorView "#ced5db")
             ] ]
           Styles.button "Nächste Frage" (fun () -> dispatch (Forward model.Game))
           text [ Styles.smallText ] 
