@@ -4,6 +4,8 @@ open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Elmish
 open System
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
 
 type Status =
 | NotStarted
@@ -53,9 +55,9 @@ let view (model:Model) (dispatch: Msg -> unit) =
     let renderPlayerScore (player: PlayerRank) = 
         let rankBg, rankColor =
             match player.Rank with
-            | 1 -> "#ffdb4a", "#a98700"
-            | 2 -> "#acb6bf", "#586169"
-            | 3 -> "#d29246", "#9a6428"
+            | 0 -> "#ffdb4a", "#a98700"
+            | 1 -> "#acb6bf", "#586169"
+            | 2 -> "#d29246", "#9a6428"
             | _ -> "#ced5db", "#848f98"
         view 
          [
@@ -81,12 +83,10 @@ let view (model:Model) (dispatch: Msg -> unit) =
                     FlexStyle.PaddingLeft 10.
                     FlexStyle.Width 20.
                     ViewStyle.BackgroundColor rankBg
-                    TextStyle.Color rankColor
-                    TextStyle.FontSize 19.
                  ]
              ]
              [
-                text [] (player.Rank.ToString())
+                text [ TextProperties.Style [TextStyle.Color rankColor; TextStyle.FontSize 19.]] (player.Rank.ToString())
              ]
             view 
              [
@@ -96,11 +96,10 @@ let view (model:Model) (dispatch: Msg -> unit) =
                     FlexStyle.FlexDirection FlexDirection.Row
                     FlexStyle.JustifyContent JustifyContent.Center
                     FlexStyle.PaddingLeft 10.
-                    TextStyle.Color rankColor
                  ]
              ]
              [
-                text [] player.Player.Name
+                text [ TextProperties.Style [TextStyle.Color rankColor]] player.Player.Name
              ]
             view 
              [
@@ -111,12 +110,10 @@ let view (model:Model) (dispatch: Msg -> unit) =
                     FlexStyle.JustifyContent JustifyContent.FlexEnd
                     FlexStyle.PaddingLeft 10.
                     FlexStyle.Width 30.
-                    ViewStyle.BackgroundColor rankBg
-                    TextStyle.Color rankColor
                  ]
              ]
              [
-                text [] (player.Player.Score.ToString())
+                text [ TextProperties.Style [TextStyle.Color rankColor; TextStyle.FontSize 18.]] (player.Player.Score.ToString())
              ]
          ]
 
@@ -126,7 +123,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
             flatList (sortedPlayers |> List.toArray) [
                 KeyExtractor (Func<_,_,_>(fun (v) _ -> v.Rank.ToString()))
                 RenderItem (Func<_,_>(fun v -> renderPlayerScore v.item))
-                ItemSeparatorComponent (Styles.separatorView "#000")
+                ItemSeparatorComponent (Styles.separatorView "#ced5db")
             ] ]
           Styles.button "Nächste Frage" (fun () -> dispatch (Forward model.Game))
           text [ Styles.smallText ] 

@@ -117,7 +117,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
             container menuRenderer
             
 
-    scrollView [
+    view [
         ViewProperties.Style 
              [ 
                 FlexStyle.AlignSelf Alignment.Stretch
@@ -125,7 +125,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
                 FlexStyle.FlexDirection FlexDirection.Column
                 FlexStyle.JustifyContent JustifyContent.FlexStart
                 FlexStyle.Padding 0.
-                FlexStyle.Flex 1.
+                FlexStyle.Flex 2.
                 ViewStyle.BackgroundColor "#fff"
              ]
     ] [
@@ -191,7 +191,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
              ]
          ]
         menu
-        view 
+        scrollView 
          [ 
             ViewProperties.Style 
              [ 
