@@ -47,7 +47,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 let view (model:Model) (dispatch: Msg -> unit) =
     let sortedPlayers = 
         model.Game.Players 
-        |> List.sortBy (fun p -> p.Score)
+        |> List.sortBy (fun p -> -p.Score - 1)
         |> List.mapi (fun i p -> {Player = p; Rank = i})
 
     let renderPlayerScore (player: PlayerRank) = 

@@ -112,7 +112,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
                     { p with Score = p.Score + score} 
                 )
         let newGame = { model.Game with Players = newPlayers }
-        { model with Game = newGame }, saveGame model.Game
+        { model with Game = newGame }, saveGame newGame
 
     | Forward game ->
         model, Cmd.none // handled above
