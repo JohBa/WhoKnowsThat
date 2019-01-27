@@ -1,4 +1,4 @@
-module Styles.ActionBarMenuEntry
+module Components.ActionBarMenuEntry
 
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props

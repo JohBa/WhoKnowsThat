@@ -7,9 +7,9 @@
     <Compile Include="Helpers.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="Database.fs" />
-    <Compile Include="Styles/Styles.fs" />
-    <Compile Include="Styles/ActionBarMenuEntry.fs" />
-    <Compile Include="Styles/ActionBarPage.fs" />
+    <Compile Include="Styles.fs" />
+    <Compile Include="Components/ActionBarMenuEntry.fs" />
+    <Compile Include="Components/ActionBarPage.fs" />
     <Compile Include="Scenes/Local/Score.fs" />
     <Compile Include="Scenes/Local/GiveAnswer.fs" />
     <Compile Include="Scenes/Local/Question.fs" />

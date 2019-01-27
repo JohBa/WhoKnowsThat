@@ -1,4 +1,4 @@
-module internal Styles.ActionBarPage
+module Components.ActionBarPage
 
 open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
@@ -11,12 +11,16 @@ type Msg =
 
 type Model = { ShowMenu: bool }
 
-let init () = { ShowMenu = false }
+let init () = { ShowMenu = false }, Cmd.none
 
 let update (msg:Msg) model : Model*Cmd<Msg> =
     match msg with
-    | ShowMenu -> { model with ShowMenu = true}, Cmd.none
-    | HideMenu -> { model with ShowMenu = false}, Cmd.none
+    | ShowMenu -> 
+      Toast.showLong "HALLO"
+      { model with ShowMenu = true}, Cmd.none
+    | HideMenu -> 
+      Toast.showLong "Hide"
+      { model with ShowMenu = false}, Cmd.none
 
 let view (entries: Fable.Import.React.ReactElement list) (content: ReactElement) (model:Model) (dispatch: Msg -> unit) =
     let shadow : Helpers.ShadowOffset = {width = 0.; height = 4.}
@@ -58,8 +62,19 @@ let view (entries: Fable.Import.React.ReactElement list) (content: ReactElement)
                      FlexStyle.MaxWidth 160.
                      FlexStyle.Right 0.
                   ]
+              ]
+              [
+                 touchableNativeFeedback 
+                  [
+                     TouchableWithoutFeedbackProperties.OnPress (fun () -> dispatch HideMenu)
+                  ]
+                  [
+                     view [ ViewProperties.Style [ ViewStyle.BackgroundColor "#fff"; FlexStyle.Padding 10.] ] [
+                         text [] "foo"
+                     ]
+                  ]
               ] 
-              entries
+              //entries
         match model.ShowMenu with
         | false -> view [] []
         | true -> 
@@ -143,4 +158,4 @@ let view (entries: Fable.Import.React.ReactElement list) (content: ReactElement)
                 content 
             ]
     
-    actionBarPage
+    actionBarPage menu dispatch
