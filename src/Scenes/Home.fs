@@ -87,5 +87,5 @@ let view (model:Model) (dispatch: Msg -> unit) =
          ]
     let scoresMenuEntry = ActionBarMenuEntry.menuEntry "Scores" (fun () -> dispatch MenuTouched)
     
-    ActionBarPage.view [scoresMenuEntry] content model.PageModel (dispatch << PageMsg)
+    ActionBarPage.view "Who Knows That?!" [scoresMenuEntry] content model.PageModel (dispatch << PageMsg)
         

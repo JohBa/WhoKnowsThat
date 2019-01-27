@@ -20,7 +20,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
     | HideMenu -> 
       { model with ShowMenu = false}, Cmd.none
 
-let view (entries: Fable.Import.React.ReactElement list) (content: ReactElement) (model:Model) (dispatch: Msg -> unit) =
+let view (pageTitle: string) (entries: Fable.Import.React.ReactElement list) (content: ReactElement) (model:Model) (dispatch: Msg -> unit) =
     let shadow : Helpers.ShadowOffset = {width = 0.; height = 4.}
 
     let menu =
@@ -110,7 +110,7 @@ let view (entries: Fable.Import.React.ReactElement list) (content: ReactElement)
                          ]
                      ]
                      [
-                        text [ TextProperties.Style [ TextStyle.FontSize 17.; TextStyle.FontWeight FontWeight.Bold ] ] "Who Knows That"
+                        text [ TextProperties.Style [ TextStyle.FontSize 17.; TextStyle.FontWeight FontWeight.Bold ] ] pageTitle
                      ]
                     view 
                      [ 
