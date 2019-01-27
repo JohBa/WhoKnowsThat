@@ -37,7 +37,6 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
 
     | PageMsg msg ->
         let submodel, subcmd = ActionBarPage.update msg model.PageModel
-        //Toast.showLong (msg.ToString())
         { model with PageModel = submodel }, Cmd.map PageMsg subcmd
 
     | MenuTouched -> 

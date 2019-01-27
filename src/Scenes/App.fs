@@ -113,6 +113,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | LocalScoreModel subModel ->
             match subMsg with
+            | Local.Score.EndGame ->
+                model, Cmd.ofMsg (NavigateTo Page.Home)
             | Local.Score.Forward game ->
                 model, Cmd.ofMsg (NavigateTo Page.LocalQuestion) @ Cmd.ofMsg (LocalQuestionMsg (Local.Question.Msg.SetGame game))
             | _ -> 

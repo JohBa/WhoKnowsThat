@@ -4,6 +4,7 @@ open Fable.Helpers.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Elmish
 open System
+open Components
 
 type Status =
 | NotStarted
@@ -15,11 +16,14 @@ type Status =
 type Msg =
 | SetGame of Model.Game
 | Forward of Model.Game
+| EndGame
+| PageMsg of ActionBarPage.Msg
 | Error of exn
 
 type Model = { 
     Status: Status
     Game: Model.Game
+    PageModel: ActionBarPage.Model
 }
 
 type PlayerRank = {
@@ -28,17 +32,26 @@ type PlayerRank = {
 }
 
 let init () = 
+    let pageModel, cmd = ActionBarPage.init()
     { 
       Game = { GameId = ""; Players = []; Questions = [] }
       Status = NotStarted
-    }, Cmd.none
+      PageModel = pageModel
+    }, Cmd.map PageMsg cmd
 
 let update (msg:Msg) model : Model*Cmd<Msg> =
     match msg with
+    | PageMsg msg ->
+        let submodel, subcmd = ActionBarPage.update msg model.PageModel
+        { model with PageModel = submodel }, Cmd.map PageMsg subcmd
+
     | SetGame game ->
         { model with Game = game }, Cmd.none
 
     | Forward game ->
+        model, Cmd.none // handled above
+
+    | EndGame ->
         model, Cmd.none // handled above
 
     | Error e ->
@@ -121,16 +134,22 @@ let view (model:Model) (dispatch: Msg -> unit) =
           Styles.separatorView "#ced5db"
          ]
 
-    scrollView [ Styles.sceneBackground ]
-        [ text [ Styles.titleText ] "Current Score"
-          view [ ViewProperties.Style [ FlexStyle.MarginTop 40.; FlexStyle.MarginBottom 40. ] ] [
-            flatList (sortedPlayers |> List.toArray) [
-                KeyExtractor (Func<_,_,_>(fun (v) _ -> v.Rank.ToString()))
-                RenderItem (Func<_,_>(fun v -> renderPlayerScore v.item))
-            ] ]
-          Styles.button "Nächste Frage" (fun () -> dispatch (Forward model.Game))
-          text [ Styles.smallText ] 
-            (match model.Status with
-             | Complete s -> s
-             | _ -> "")  
-        ]
+    let content = 
+        scrollView [ Styles.sceneBackground ]
+            [ text [ Styles.titleText ] "Current Score"
+              view [ ViewProperties.Style [ FlexStyle.MarginTop 40.; FlexStyle.MarginBottom 40. ] ] [
+                flatList (sortedPlayers |> List.toArray) [
+                    KeyExtractor (Func<_,_,_>(fun (v) _ -> v.Rank.ToString()))
+                    RenderItem (Func<_,_>(fun v -> renderPlayerScore v.item))
+                ] ]
+              Styles.button "Nächste Frage" (fun () -> dispatch (Forward model.Game))
+              text [ Styles.smallText ] 
+                (match model.Status with
+                 | Complete s -> s
+                 | _ -> "")  
+            ]
+
+    let endGameMenuEntry = ActionBarMenuEntry.menuEntry "Spiel beenden" (fun () -> dispatch EndGame)
+    
+    ActionBarPage.view "Ranking" [endGameMenuEntry] content model.PageModel (dispatch << PageMsg)
+
