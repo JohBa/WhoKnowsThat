@@ -76,10 +76,6 @@ let view (model:Model) (dispatch: Msg -> unit) =
              ] 
          ]
          [ 
-           text 
-             [ 
-                 Styles.titleText
-             ] "Who knows that?!"
            view [ ViewProperties.Style [ FlexStyle.MarginTop 50. ] ] 
             [
              button 
