@@ -34,7 +34,7 @@ type PlayerRank = {
 let init () = 
     let pageModel, cmd = ActionBarPage.init()
     { 
-      Game = (0, { GameId = ""; Players = []; Questions = [] })
+      Game = (0, { GameId = ""; Players = []; Questions = []; Date = DateTime.Now })
       Status = NotStarted
       PageModel = pageModel
     }, Cmd.map PageMsg cmd

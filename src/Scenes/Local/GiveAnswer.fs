@@ -5,6 +5,7 @@ open Fable.Helpers.ReactNative.Props
 open Elmish
 open Fable.Helpers.ReactNativeSimpleStore
 open Model
+open System
 
 type Status =
 | NotStarted
@@ -45,7 +46,7 @@ let init () =
       Answers = []
       GivenAnswers = []
       CurrentPlayer = { Id = ""; Name = ""; Score = 0 }
-      Game = 0, { GameId = ""; Players = []; Questions = [] }
+      Game = 0, { GameId = ""; Players = []; Questions = []; Date = DateTime.Now }
       PlayersLeft = []
     }, Cmd.none
 

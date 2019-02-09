@@ -5,6 +5,11 @@ open Elmish
 open Fable.Helpers.ReactNative.Props
 open Elmish.React
 open Components
+open System
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
+open Fable.Import.ReactNative
+open Fable.Helpers.ReactNative.Props
 
 // Model
 type Msg =
@@ -41,23 +46,49 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
     | ToHome -> 
         model, Cmd.none // handled in app
 
-    | GetQuestions ->
-        { model with StatusText = "Load questions..." },
-        Cmd.ofPromise Database.createQuestions () QuestionsLoaded Error
-
-    | GetGames indexedGames ->
+    | GamesLoaded indexedGames ->
         { model with Games = indexedGames },
         Cmd.none
 
     | Error e ->
         { model with StatusText = string e.Message }, Cmd.none
 
-    | QuestionsLoaded qs ->
-        { model with StatusText = "Questions loaded: " + qs.ToString()}, Cmd.none
-
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
-    let gameIndex = model.Games.Length + 1 
+    let renderGame ((gamePos, game): int * Model.Game) =
+        let content = sprintf "%s, %i Players" (game.Date.ToString "dd.MM.yyyy") game.Players.Length
+        view []
+         [
+          view 
+           [
+              ViewProperties.Style 
+               [
+                  FlexStyle.AlignItems ItemAlignment.Center
+                  FlexStyle.FlexDirection FlexDirection.Row
+                  ViewStyle.BackgroundColor "#eee"
+                  FlexStyle.MarginBottom 20.0
+                  FlexStyle.Padding 10.0
+                  FlexStyle.MinHeight 55.0
+               ]
+           ]
+           [
+              view 
+               [
+                  ViewProperties.Style 
+                   [
+                      FlexStyle.Flex 1.
+                      FlexStyle.AlignSelf Alignment.Stretch
+                      FlexStyle.FlexDirection FlexDirection.Row
+                      FlexStyle.JustifyContent JustifyContent.FlexStart
+                      FlexStyle.AlignItems ItemAlignment.Center
+                      FlexStyle.PaddingLeft 10.
+                   ]
+               ]
+               [
+                  text [ TextProperties.Style [TextStyle.Color "#000"; TextStyle.FontSize 16.0]] content
+               ]
+           ]           
+         ]
 
     let content = 
         scrollView 
@@ -65,30 +96,26 @@ let view (model:Model) (dispatch: Msg -> unit) =
             ViewProperties.Style 
              [ 
                 FlexStyle.AlignSelf Alignment.Stretch
-                FlexStyle.Padding 20.               
+                FlexStyle.Padding 0.               
                 ViewStyle.ShadowOpacity 0.8
                 ViewStyle.ShadowRadius 3.
                 FlexStyle.Flex 2.
              ] 
          ]
          [ 
-           text 
-             [ 
-                 Styles.titleText
-             ] "Who knows that?!"
-           view [ ViewProperties.Style [ FlexStyle.MarginTop 50. ] ] 
+           view [ ViewProperties.Style [ FlexStyle.MarginTop 10.; FlexStyle.MarginBottom 10. ] ] 
             [
-             button 
-              [
-                 ButtonProperties.Title "Start local Game"
-                 ButtonProperties.OnPress (fun () -> dispatch (StartLocalGame gameIndex))
-              ] [ ]
-            ] 
+                flatList (model.Games) [
+                    KeyExtractor (Func<_,_,_>(fun (i,_) _ -> i.ToString()))
+                    RenderItem (Func<_,_>(fun v -> renderGame (fst(v.item), snd(v.item))))
+                ]
+            ]
            Styles.whitespace
            Styles.whitespace
            text [ Styles.smallText ] model.StatusText  
          ]
-    let scoresMenuEntry = ActionBarMenuEntry.menuEntry "Scores" (fun () -> dispatch MenuTouched)
+
+    let homeMenuEntry = ActionBarMenuEntry.menuEntry "Home" (fun () -> dispatch ToHome)
     
-    ActionBarPage.view "Who Knows That?!" [scoresMenuEntry] content model.PageModel (dispatch << PageMsg)
+    ActionBarPage.view "Highscores" [homeMenuEntry] content model.PageModel (dispatch << PageMsg)
         

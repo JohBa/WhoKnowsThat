@@ -3,13 +3,14 @@ module Home
 open Fable.Helpers.ReactNative
 open Elmish
 open Fable.Helpers.ReactNative.Props
+open Fable.Helpers.ReactNativeSimpleStore
 open Elmish.React
 open Components
 
 // Model
 type Msg =
 | StartLocalGame of int
-| MenuTouched
+| ToScores
 | GetQuestions
 | GetGames of (int * Model.Game)[]
 | PageMsg of ActionBarPage.Msg
@@ -41,9 +42,8 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
         let submodel, subcmd = ActionBarPage.update msg model.PageModel
         { model with PageModel = submodel }, Cmd.map PageMsg subcmd
 
-    | MenuTouched -> 
-        Toast.showLong "menu touched"
-        model, Cmd.none
+    | ToScores -> 
+        model, Cmd.none // handled in app
 
     | GetQuestions ->
         { model with StatusText = "Load questions..." },
@@ -61,7 +61,7 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
 
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
-    let gameIndex = model.Games.Length + 1 
+    let gameIndex = model.Games.Length
 
     let content = 
         scrollView 
@@ -92,7 +92,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
            Styles.whitespace
            text [ Styles.smallText ] model.StatusText  
          ]
-    let scoresMenuEntry = ActionBarMenuEntry.menuEntry "Scores" (fun () -> dispatch MenuTouched)
+    let scoresMenuEntry = ActionBarMenuEntry.menuEntry "Scores" (fun () -> dispatch ToScores)
     
     ActionBarPage.view "Who Knows That?!" [scoresMenuEntry] content model.PageModel (dispatch << PageMsg)
         

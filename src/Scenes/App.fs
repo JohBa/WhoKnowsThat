@@ -9,6 +9,7 @@ open Fable.Helpers.ReactNative.Props
 type Page =
 | Home
 | Question
+| ScoresList
 | LocalChoosePlayer
 | LocalQuestion
 | LocalGiveAnswer
@@ -20,6 +21,7 @@ type Msg =
 | NavigateBack
 | ExitApp
 | HomeSceneMsg of Home.Msg
+| ScoresListSceneMsg of ScoresList.Msg
 | QuestionSceneMsg of Question.Msg
 | LocalChoosePlayerMsg of Local.ChoosePlayer.Msg
 | LocalQuestionMsg of Local.Question.Msg
@@ -28,6 +30,7 @@ type Msg =
 
 type SubModel =
 | HomeModel of Home.Model
+| ScoresListModel of ScoresList.Model
 | QuestionModel of Question.Model
 | LocalChoosePlayerModel of Local.ChoosePlayer.Model
 | LocalQuestionModel of Local.Question.Model
@@ -45,6 +48,7 @@ let wrap ctor msgCtor model (subModel,cmd)  =
 let navigateTo page newStack model =
     match page with
     | Page.Home -> Home.init() |> wrap HomeModel HomeSceneMsg model
+    | Page.ScoresList -> ScoresList.init() |> wrap ScoresListModel ScoresListSceneMsg model
     | Page.Question -> Question.init() |> wrap QuestionModel QuestionSceneMsg model
     | Page.LocalChoosePlayer -> Local.ChoosePlayer.init() |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
     | Page.LocalQuestion -> Local.Question.init() |> wrap LocalQuestionModel LocalQuestionMsg model
@@ -65,8 +69,20 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
             match subMsg with
             | Home.StartLocalGame gamePos ->
                 model, Cmd.ofMsg (NavigateTo Page.LocalChoosePlayer) @ Cmd.ofMsg (LocalChoosePlayerMsg (Local.ChoosePlayer.Msg.SetGamePos gamePos))
+            | Home.ToScores ->
+                model, Cmd.ofMsg (NavigateTo Page.ScoresList)
             | _ ->
                 Home.update subMsg subModel |> wrap HomeModel HomeSceneMsg model
+        | _ -> model, Cmd.none
+
+    | ScoresListSceneMsg subMsg ->
+        match model.SubModel with
+        | ScoresListModel subModel -> 
+            match subMsg with
+            | ScoresList.ToHome ->
+                model, Cmd.ofMsg (NavigateTo Page.Home)
+            | _ ->
+                ScoresList.update subMsg subModel |> wrap ScoresListModel ScoresListSceneMsg model
         | _ -> model, Cmd.none
         
     | QuestionSceneMsg subMsg ->
@@ -144,6 +160,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 let view (model:Model) (dispatch: Msg -> unit) =
     match model.SubModel with
     | HomeModel model -> Home.view model (HomeSceneMsg >> dispatch)
+    | ScoresListModel model -> ScoresList.view model (ScoresListSceneMsg >> dispatch)
     | QuestionModel model -> Question.view model (QuestionSceneMsg >> dispatch)
     | LocalChoosePlayerModel model -> Local.ChoosePlayer.view model (LocalChoosePlayerMsg >> dispatch)
     | LocalQuestionModel model -> Local.Question.view model (LocalQuestionMsg >> dispatch)

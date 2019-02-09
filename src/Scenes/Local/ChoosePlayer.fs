@@ -36,6 +36,7 @@ let init () =
         GamePos = 0
         Game = 
             {
+                Date = DateTime.Now
                 GameId = System.Guid.NewGuid().ToString()
                 Players = []
                 Questions = []
@@ -44,6 +45,7 @@ let init () =
 
 let save (model : Model) = 
     let game : Model.Game = {
+        Date = DateTime.Now
         GameId = System.Guid.NewGuid().ToString()
         Players = model.Players
         Questions = []
@@ -58,6 +60,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
             GameId = System.Guid.NewGuid().ToString()
             Players = model.Players
             Questions = []
+            Date = DateTime.Now
         }
         { model with Game = game }, Cmd.ofPromise save model (fun _ -> Forward (model.GamePos, game)) Error
 

@@ -28,6 +28,7 @@ type GameQuestion = {
 
 type Game = {
     GameId: string
+    Date: DateTime
     Players: Player list
     Questions: GameQuestion list
 }
