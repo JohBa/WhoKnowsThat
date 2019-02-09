@@ -95,12 +95,12 @@ let separatorView separatorColor =
 let fab size bgColor icon onPress = 
     [view [
         ViewProperties.Style [
+            FlexStyle.Position Position.Absolute
             FlexStyle.Width size
             FlexStyle.Height size
             ViewStyle.BorderRadius (size/2.)
             ViewStyle.Elevation 8.
             FlexStyle.ZIndex 99.
-            FlexStyle.Position Position.Absolute
             FlexStyle.Bottom 35.
             FlexStyle.Right 35.
             ViewStyle.BackgroundColor bgColor
@@ -115,4 +115,4 @@ let fab size bgColor icon onPress =
            FlexStyle.AlignSelf Alignment.Center
          ]
        ]
-    ]] |> touchableNativeFeedback [OnPress onPress]
+    ]] |> touchableWithoutFeedback [OnPress onPress]
