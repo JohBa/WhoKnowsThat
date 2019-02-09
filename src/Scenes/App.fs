@@ -63,8 +63,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | HomeModel subModel -> 
             match subMsg with
-            | Home.StartLocalGame ->
-                model, Cmd.ofMsg (NavigateTo Page.LocalChoosePlayer)
+            | Home.StartLocalGame gamePos ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalChoosePlayer) @ Cmd.ofMsg (LocalChoosePlayerMsg (Local.ChoosePlayer.Msg.SetGamePos gamePos))
             | _ ->
                 Home.update subMsg subModel |> wrap HomeModel HomeSceneMsg model
         | _ -> model, Cmd.none

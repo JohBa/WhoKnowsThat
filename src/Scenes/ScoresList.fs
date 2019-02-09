@@ -1,4 +1,4 @@
-module Home
+module ScoresList
 
 open Fable.Helpers.ReactNative
 open Elmish
@@ -8,12 +8,10 @@ open Components
 
 // Model
 type Msg =
-| StartLocalGame of int
-| MenuTouched
-| GetQuestions
-| GetGames of (int * Model.Game)[]
+| ShowGameScore of int
+| ToHome
+| GamesLoaded of (int * Model.Game)[]
 | PageMsg of ActionBarPage.Msg
-| QuestionsLoaded of int
 | Error of exn
 
 type Model = { 
@@ -28,22 +26,20 @@ let init () =
     { StatusText = ""; ShowMenu = false; PageModel = pageModel; Games = [||] }, 
         Cmd.batch [
             Cmd.map PageMsg cmd
-            Cmd.ofMsg GetQuestions
-            Cmd.ofPromise Database.getIndexedGames () GetGames Error]
+            Cmd.ofPromise Database.getIndexedGames () GamesLoaded Error]
 
 // Update
 let update (msg: Msg) model : Model*Cmd<Msg> =
     match msg with
-    | StartLocalGame gameIndex ->
+    | ShowGameScore gameIndex ->
         model, Cmd.none // handled in app
 
     | PageMsg msg ->
         let submodel, subcmd = ActionBarPage.update msg model.PageModel
         { model with PageModel = submodel }, Cmd.map PageMsg subcmd
 
-    | MenuTouched -> 
-        Toast.showLong "menu touched"
-        model, Cmd.none
+    | ToHome -> 
+        model, Cmd.none // handled in app
 
     | GetQuestions ->
         { model with StatusText = "Load questions..." },

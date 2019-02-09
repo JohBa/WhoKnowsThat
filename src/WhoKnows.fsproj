@@ -15,6 +15,7 @@
     <Compile Include="Scenes/Local/Question.fs" />
     <Compile Include="Scenes/Local/ChoosePlayer.fs" />
     <Compile Include="Scenes/Question.fs" />
+    <Compile Include="Scenes/ScoresList.fs" />
     <Compile Include="Scenes/Home.fs" />
     <Compile Include="Scenes/App.fs" />
     <Compile Include="WhoKnows.fs" />
