@@ -5,6 +5,7 @@ open Elmish
 open Fable.Helpers.ReactNative.Props
 open System
 open Fable.Helpers.ReactNativeSimpleStore
+open Fable
 
 
 // Model
@@ -12,6 +13,7 @@ type Msg =
 | Save
 | Forward of int * Model.Game
 | AcceptInput
+| CancelAdding
 | DeletePlayer of string
 | AddNewPlayer
 | SetGamePos of int
@@ -56,13 +58,19 @@ let save (model : Model) =
 let update (msg:Msg) model : Model*Cmd<Msg> =
     match msg with
     | Save ->
-        let game : Model.Game = {
-            GameId = System.Guid.NewGuid().ToString()
-            Players = model.Players
-            Questions = []
-            Date = DateTime.Now
-        }
-        { model with Game = game }, Cmd.ofPromise save model (fun _ -> Forward (model.GamePos, game)) Error
+        let updateModel, updateCmd = 
+            if model.Players.Length > 1 then
+                let game : Model.Game = {
+                    GameId = System.Guid.NewGuid().ToString()
+                    Players = model.Players
+                    Questions = []
+                    Date = DateTime.Now
+                }
+                { model with Game = game }, Cmd.ofPromise save model (fun _ -> Forward (model.GamePos, game)) Error
+            else
+                Toast.showLong "A game must have at least 2 players."
+                model, Cmd.none
+        updateModel, updateCmd
 
     | SetGamePos i ->
         { model with GamePos = i }, Cmd.none
@@ -73,6 +81,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
     | AddNewPlayer ->
         { model with IsAdding = true }, Cmd.none
 
+    | CancelAdding ->
+        { model with IsAdding = false; PlayerName = "" }, Cmd.none
     | AcceptInput -> 
         let playersList = match model.PlayerName.Length with
                           | 0 -> model.Players
@@ -129,53 +139,68 @@ let view (model:Model) (dispatch: Msg -> unit) =
         match model.IsAdding with
         | true ->
             view 
-             [ 
+              [ 
                 ViewProperties.Style [ 
-                    FlexStyle.FlexDirection FlexDirection.Row
-                    FlexStyle.MarginTop 3. 
-                    FlexStyle.MarginBottom 3.
                     FlexStyle.AlignSelf Alignment.Stretch
-                    FlexStyle.Height 60.
+                    FlexStyle.Flex 1.
+                    FlexStyle.JustifyContent JustifyContent.Center
+                    FlexStyle.Margin 20.
+                    FlexStyle.Height 240.
+                    FlexStyle.Position Position.Absolute
+                    ViewStyle.BackgroundColor "#fff"
+                    ViewStyle.Elevation 40.
+                    FlexStyle.Top 30.
+                    FlexStyle.Left 1.
+                    FlexStyle.Right 1.
+                    FlexStyle.Padding 10.
                 ] 
-             ] [
+              ] [
               textInput [
                 TextInput.TextInputProperties.AutoCorrect true
                 TextInput.TextInputProperties.OnChangeText (PlayerNameChanged >> dispatch)
-                TextInput.OnEndEditing (fun _ -> dispatch AcceptInput)
                 TextInput.TextInputProperties.Style [
-                    FlexStyle.Flex 1.
                     FlexStyle.AlignItems ItemAlignment.Stretch
-                    FlexStyle.Height 55.
+                    FlexStyle.Flex 1.
                 ]
               ] model.PlayerName
+              view [ ViewProperties.Style [FlexStyle.FlexDirection FlexDirection.Row; FlexStyle.JustifyContent JustifyContent.FlexEnd; FlexStyle.Padding 10.]] [
+                  button [
+                   ButtonProperties.Title "Cancel"
+                   ButtonProperties.Color "#bbb"
+                   ButtonProperties.OnPress (fun () -> dispatch CancelAdding)] [ ]
+                  Styles.whitespace
+                  Styles.whitespace
+                  Styles.whitespace
+                  button [
+                   ButtonProperties.Title "Add Player"
+                   ButtonProperties.Color Styles.brandSuccess
+                   ButtonProperties.OnPress (fun () -> dispatch AcceptInput)] [ ]
+              ]
              ]
         | _ -> Styles.whitespace
-     
-    scrollView [ Styles.sceneBackground ]
-      [ text 
-          [ 
-              Styles.titleText
-          ] "Choose your players"
-        view [ ViewProperties.Style [ FlexStyle.MarginTop 40.; FlexStyle.MarginBottom 40. ] ] [
-            flatList (model.Players |> List.toArray) [
-                KeyExtractor (Func<_,_,_>(fun (v) _ -> v.Id))
-                RenderItem (Func<_,_>(fun v -> renderPlayer v.item))
-                ItemSeparatorComponent (Styles.separatorView "#000")
-            ] ]
+
+    view [ ViewProperties.Style [ FlexStyle.Flex 1.] ] [
+        scrollView [ Styles.sceneBackground ]
+         [ text 
+             [ 
+                Styles.titleText
+             ] "Choose your players"
+           view [ ViewProperties.Style [ FlexStyle.MarginTop 40.; FlexStyle.MarginBottom 40. ] ] [
+              flatList (model.Players |> List.toArray) [
+                  KeyExtractor (Func<_,_,_>(fun (v) _ -> v.Id))
+                  RenderItem (Func<_,_>(fun v -> renderPlayer v.item))
+                  ItemSeparatorComponent (Styles.separatorView "#000")
+              ] ]
+           view [ ViewProperties.Style [ FlexStyle.MarginTop 20.; FlexStyle.JustifyContent JustifyContent.FlexEnd; FlexStyle.Flex 1. ] ] [
+            button [
+                ButtonProperties.Title "Start the game"
+                ButtonProperties.OnPress (fun () -> dispatch Save)
+            ] [ ]
+           ]
+           Styles.whitespace
+           Styles.whitespace
+           text [ Styles.smallText ] model.StatusText
+         ]
         addPlayer
-        view [ ViewProperties.Style [ FlexStyle.MarginTop 20. ] ] [
-          button [
-              ButtonProperties.Title "Add player"
-              ButtonProperties.OnPress (fun () -> dispatch AddNewPlayer)
-          ] [ ]
-        ]
-        view [ ViewProperties.Style [ FlexStyle.MarginTop 20. ] ] [
-          button [
-              ButtonProperties.Title "Start the game"
-              ButtonProperties.OnPress (fun () -> dispatch Save)
-          ] [ ]
-        ]
-        Styles.whitespace
-        Styles.whitespace
-        text [ Styles.smallText ] model.StatusText  
-      ]
+        Styles.fab 60. Styles.brandPrimary (localImage "${entryDir}/../images/plusthick_48x48.png") (fun () -> dispatch AddNewPlayer)
+    ]
