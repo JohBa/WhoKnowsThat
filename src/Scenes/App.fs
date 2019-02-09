@@ -81,6 +81,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
             match subMsg with
             | ScoresList.ToHome ->
                 model, Cmd.ofMsg (NavigateTo Page.Home)
+            | ScoresList.ToScore (gamePos, game) ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalScore) @ Cmd.ofMsg (LocalScoreMsg (Local.Score.Msg.SetGame (gamePos, game)))
             | _ ->
                 ScoresList.update subMsg subModel |> wrap ScoresListModel ScoresListSceneMsg model
         | _ -> model, Cmd.none

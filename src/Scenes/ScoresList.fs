@@ -10,6 +10,7 @@ open Fable.Import.ReactNative
 open Fable.Helpers.ReactNative.Props
 open Fable.Import.ReactNative
 open Fable.Helpers.ReactNative.Props
+open Styles
 
 // Model
 type Msg =
@@ -17,6 +18,7 @@ type Msg =
 | ToHome
 | GamesLoaded of (int * Model.Game)[]
 | PageMsg of ActionBarPage.Msg
+| ToScore of int * Model.Game
 | Error of exn
 
 type Model = { 
@@ -43,12 +45,17 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
         let submodel, subcmd = ActionBarPage.update msg model.PageModel
         { model with PageModel = submodel }, Cmd.map PageMsg subcmd
 
+    | ToScore (gamePos, game) ->
+        model, Cmd.none // handled in app
+    
     | ToHome -> 
         model, Cmd.none // handled in app
 
     | GamesLoaded indexedGames ->
         { model with Games = indexedGames },
         Cmd.none
+
+     
 
     | Error e ->
         { model with StatusText = string e.Message }, Cmd.none
@@ -57,7 +64,7 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
 let view (model:Model) (dispatch: Msg -> unit) =
     let renderGame ((gamePos, game): int * Model.Game) =
         let content = sprintf "%s, %i Players" (game.Date.ToString "dd.MM.yyyy") game.Players.Length
-        view []
+        [ view []
          [
           view 
            [
@@ -65,10 +72,9 @@ let view (model:Model) (dispatch: Msg -> unit) =
                [
                   FlexStyle.AlignItems ItemAlignment.Center
                   FlexStyle.FlexDirection FlexDirection.Row
-                  ViewStyle.BackgroundColor "#eee"
-                  FlexStyle.MarginBottom 20.0
+                  ViewStyle.BackgroundColor "#fff"
                   FlexStyle.Padding 10.0
-                  FlexStyle.MinHeight 55.0
+                  FlexStyle.MinHeight 65.0
                ]
            ]
            [
@@ -87,8 +93,9 @@ let view (model:Model) (dispatch: Msg -> unit) =
                [
                   text [ TextProperties.Style [TextStyle.Color "#000"; TextStyle.FontSize 16.0]] content
                ]
-           ]           
-         ]
+           ]
+          separatorView "#ddd"           
+         ]] |> touchableNativeFeedback [OnPress (fun () -> dispatch (ToScore (gamePos, game)))]
 
     let content = 
         scrollView 
@@ -103,7 +110,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
              ] 
          ]
          [ 
-           view [ ViewProperties.Style [ FlexStyle.MarginTop 10.; FlexStyle.MarginBottom 10. ] ] 
+           view [ ] 
             [
                 flatList (model.Games) [
                     KeyExtractor (Func<_,_,_>(fun (i,_) _ -> i.ToString()))
