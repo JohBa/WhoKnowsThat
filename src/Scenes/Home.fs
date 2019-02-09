@@ -3,7 +3,6 @@ module Home
 open Fable.Helpers.ReactNative
 open Elmish
 open Fable.Helpers.ReactNative.Props
-open Fable.Helpers.ReactNativeSimpleStore
 open Elmish.React
 open Components
 
@@ -12,6 +11,7 @@ type Msg =
 | StartLocalGame
 | MenuTouched
 | GetQuestions
+| GetGames of (int * Model.Game)[]
 | PageMsg of ActionBarPage.Msg
 | QuestionsLoaded of int
 | Error of exn
@@ -20,14 +20,16 @@ type Model = {
     StatusText: string
     ShowMenu: bool
     PageModel: ActionBarPage.Model
+    Games: (int * Model.Game) []
 }
 
 let init () = 
     let pageModel, cmd = ActionBarPage.init()
-    { StatusText = ""; ShowMenu = false; PageModel = pageModel }, 
+    { StatusText = ""; ShowMenu = false; PageModel = pageModel; Games = [||] }, 
         Cmd.batch [
             Cmd.map PageMsg cmd
-            Cmd.ofPromise DB.clear<Model.Game> () (fun _ -> GetQuestions) Error]
+            Cmd.ofMsg GetQuestions
+            Cmd.ofPromise Database.getIndexedGames () GetGames Error]
 
 // Update
 let update (msg: Msg) model : Model*Cmd<Msg> =
@@ -47,6 +49,10 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
         { model with StatusText = "Load questions..." },
         Cmd.ofPromise Database.createQuestions () QuestionsLoaded Error
 
+    | GetGames indexedGames ->
+        { model with Games = indexedGames },
+        Cmd.none
+
     | Error e ->
         { model with StatusText = string e.Message }, Cmd.none
 
@@ -55,6 +61,8 @@ let update (msg: Msg) model : Model*Cmd<Msg> =
 
 // View
 let view (model:Model) (dispatch: Msg -> unit) =
+    let gameIndex = model.Games.Length + 1 
+
     let content = 
         scrollView 
          [ 

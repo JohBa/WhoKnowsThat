@@ -14,15 +14,15 @@ type Status =
 
 // Model
 type Msg =
-| SetGame of Model.Game
-| Forward of Model.Game
+| SetGame of int * Model.Game
+| Forward of int * Model.Game
 | EndGame
 | PageMsg of ActionBarPage.Msg
 | Error of exn
 
 type Model = { 
     Status: Status
-    Game: Model.Game
+    Game: int * Model.Game
     PageModel: ActionBarPage.Model
 }
 
@@ -34,7 +34,7 @@ type PlayerRank = {
 let init () = 
     let pageModel, cmd = ActionBarPage.init()
     { 
-      Game = { GameId = ""; Players = []; Questions = [] }
+      Game = (0, { GameId = ""; Players = []; Questions = [] })
       Status = NotStarted
       PageModel = pageModel
     }, Cmd.map PageMsg cmd
@@ -45,10 +45,10 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         let submodel, subcmd = ActionBarPage.update msg model.PageModel
         { model with PageModel = submodel }, Cmd.map PageMsg subcmd
 
-    | SetGame game ->
-        { model with Game = game }, Cmd.none
+    | SetGame (gamePos, game) ->
+        { model with Game = (gamePos, game) }, Cmd.none
 
-    | Forward game ->
+    | Forward (gamePos, game) ->
         model, Cmd.none // handled above
 
     | EndGame ->
@@ -59,7 +59,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
 
 let view (model:Model) (dispatch: Msg -> unit) =
     let sortedPlayers = 
-        model.Game.Players 
+        snd(model.Game).Players 
         |> List.sortBy (fun p -> (~-)p.Score)
         |> List.mapi (fun i p -> {Player = p; Rank = i})
 

@@ -17,10 +17,10 @@ type Msg =
 | GetQuestion
 | QuestionLoaded of int * Model.Question
 | SaveAnswer
-| SetGame of Model.Game
+| SetGame of int * Model.Game
 | SaveGame
 | NextPlayer
-| Forward of Model.Game
+| Forward of int * Model.Game
 | Error of exn
 
 type Model = { 
@@ -29,13 +29,13 @@ type Model = {
     PlayerAnswers: Model.PlayerAnswer list
     CurrentAnswer: string
     CurrentPlayer: Model.Player
-    Game: Model.Game
+    Game: int * Model.Game
     PlayersLeft: Model.Player list
 }
 
 let init () = 
     { 
-      Game = { GameId = ""; Players = []; Questions = [] }
+      Game = (0, { GameId = ""; Players = []; Questions = [] })
       Status = NotStarted
       Question = { CorrectAnswer = ""; Question = ""; Language = ""; TrueOrFalse = false }
       PlayerAnswers = []
@@ -44,9 +44,9 @@ let init () =
       PlayersLeft = []
     }, Cmd.ofMsg GetQuestion
 
-let updateGame (game : Model.Game) = DB.update (0, game)
+let updateGame (game : int * Model.Game) = DB.update (fst(game), snd(game))
 
-let saveGame (game : Model.Game) = 
+let saveGame (game : int * Model.Game) = 
     Cmd.ofPromise
         updateGame
         game
@@ -58,8 +58,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
     | GetQuestion ->
         { model with Status = InProgress }, Cmd.ofPromise Database.getRandomQuestion () QuestionLoaded Error
     
-    | SetGame game ->
-        { model with Game = game; PlayersLeft = game.Players }, Cmd.ofMsg NextPlayer
+    | SetGame (gamePos, game) ->
+        { model with Game = (gamePos, game); PlayersLeft = game.Players }, Cmd.ofMsg NextPlayer
 
     | NextPlayer ->
         let tail = model.PlayersLeft.Tail
@@ -88,10 +88,10 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
     
     | SaveGame ->
         let gameQuestion : Model.GameQuestion = { Question = model.Question; Answers = model.PlayerAnswers }
-        let newGame : Model.Game = { model.Game with Questions =  [gameQuestion] @ model.Game.Questions } 
+        let newGame : int * Model.Game = (fst(model.Game), { snd(model.Game) with Questions = [gameQuestion] @ snd(model.Game).Questions })
         { model with Game = newGame }, saveGame newGame
 
-    | Forward game ->
+    | Forward (gamePos, game) ->
         model, Cmd.none // handled above
 
     | Error e ->

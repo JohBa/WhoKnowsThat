@@ -64,7 +64,7 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         | HomeModel subModel -> 
             match subMsg with
             | Home.StartLocalGame ->
-                model, Cmd.ofMsg (NavigateTo Page.LocalChoosePlayer) 
+                model, Cmd.ofMsg (NavigateTo Page.LocalChoosePlayer)
             | _ ->
                 Home.update subMsg subModel |> wrap HomeModel HomeSceneMsg model
         | _ -> model, Cmd.none
@@ -81,8 +81,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | LocalChoosePlayerModel subModel ->
             match subMsg with
-            | Local.ChoosePlayer.Forward game ->
-                model, Cmd.ofMsg (NavigateTo Page.LocalQuestion) @ Cmd.ofMsg (LocalQuestionMsg (Local.Question.Msg.SetGame game))
+            | Local.ChoosePlayer.Forward (gamePos, game) ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalQuestion) @ Cmd.ofMsg (LocalQuestionMsg (Local.Question.Msg.SetGame (gamePos, game)))
             | _ -> 
                 Local.ChoosePlayer.update subMsg subModel |> wrap LocalChoosePlayerModel LocalChoosePlayerMsg model
         | _ -> model, Cmd.none
@@ -91,8 +91,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | LocalQuestionModel subModel ->
             match subMsg with
-            | Local.Question.Forward game ->
-                model, Cmd.ofMsg (NavigateTo Page.LocalGiveAnswer) @ Cmd.ofMsg (LocalGiveAnswerMsg (Local.GiveAnswer.Msg.SetGame game))
+            | Local.Question.Forward (gamePos, game) ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalGiveAnswer) @ Cmd.ofMsg (LocalGiveAnswerMsg (Local.GiveAnswer.Msg.SetGame (gamePos, game)))
             | _ -> 
                 Local.Question.update subMsg subModel |> wrap LocalQuestionModel LocalQuestionMsg model
         | _ -> 
@@ -102,8 +102,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
         match model.SubModel with
         | LocalGiveAnswerModel subModel ->
             match subMsg with
-            | Local.GiveAnswer.Forward game ->
-                model, Cmd.ofMsg (NavigateTo Page.LocalScore) @ Cmd.ofMsg (LocalScoreMsg (Local.Score.Msg.SetGame game))
+            | Local.GiveAnswer.Forward (gamePos, game) ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalScore) @ Cmd.ofMsg (LocalScoreMsg (Local.Score.Msg.SetGame (gamePos, game)))
             | _ -> 
                 Local.GiveAnswer.update subMsg subModel |> wrap LocalGiveAnswerModel LocalGiveAnswerMsg model
         | _ -> 
@@ -115,8 +115,8 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
             match subMsg with
             | Local.Score.EndGame ->
                 model, Cmd.ofMsg (NavigateTo Page.Home)
-            | Local.Score.Forward game ->
-                model, Cmd.ofMsg (NavigateTo Page.LocalQuestion) @ Cmd.ofMsg (LocalQuestionMsg (Local.Question.Msg.SetGame game))
+            | Local.Score.Forward (gamePos, game) ->
+                model, Cmd.ofMsg (NavigateTo Page.LocalQuestion) @ Cmd.ofMsg (LocalQuestionMsg (Local.Question.Msg.SetGame (gamePos, game)))
             | _ -> 
                 Local.Score.update subMsg subModel |> wrap LocalScoreModel LocalScoreMsg model
         | _ -> 

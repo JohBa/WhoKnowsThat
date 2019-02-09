@@ -25,6 +25,10 @@ let createQuestions() =
         | error -> return 0
     }
 
+let getIndexedGames () =
+    DB.getAll<Model.Game>()
+    |> Promise.map (Array.mapi (fun i r -> i,r))
+
 let getIndexedQuestions() =
     DB.getAll<Model.Question>()
     |> Promise.map (Array.mapi (fun i r -> i,r))

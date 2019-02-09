@@ -10,10 +10,11 @@ open Fable.Helpers.ReactNativeSimpleStore
 // Model
 type Msg =
 | Save
-| Forward of Model.Game
+| Forward of int * Model.Game
 | AcceptInput
 | DeletePlayer of string
 | AddNewPlayer
+| SetGamePos of int
 | PlayerNameChanged of string
 | Error of exn
 
@@ -23,6 +24,7 @@ type Model = {
     StatusText: string
     IsAdding: bool
     Game: Model.Game
+    GamePos: int
 }
 
 let init () = 
@@ -31,6 +33,7 @@ let init () =
         StatusText = ""
         Players = []
         IsAdding = false
+        GamePos = 0
         Game = 
             {
                 GameId = System.Guid.NewGuid().ToString()
@@ -56,9 +59,12 @@ let update (msg:Msg) model : Model*Cmd<Msg> =
             Players = model.Players
             Questions = []
         }
-        { model with Game = game }, Cmd.ofPromise save model (fun _ -> Forward game) Error
+        { model with Game = game }, Cmd.ofPromise save model (fun _ -> Forward (model.GamePos, game)) Error
 
-    | Forward game ->
+    | SetGamePos i ->
+        { model with GamePos = i }, Cmd.none
+
+    | Forward (gamePos, game) ->
         model, Cmd.none // handled above
 
     | AddNewPlayer ->
